@@ -1,2 +1,2 @@
-# Kiribi-Concurrent
-Kiribi concurrency module
+# Kiribi-Service
+Kiribi Service Module
