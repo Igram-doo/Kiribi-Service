@@ -33,7 +33,7 @@ import rs.igram.kiribi.io.VarOutput;
 import rs.igram.kiribi.io.VarOutputStream;
 
 /**
- * An instance of this class represents a UDP message.
+ * An instance of this class represents a data message between peers.
  *
  * @author Michael Sargent
  */

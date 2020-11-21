@@ -92,4 +92,7 @@ class DescriptorProxy implements Service, Encodable {
 		}
 		return false;
 	}
+	
+	@Override
+	public Session newSession() {return null;}
 }

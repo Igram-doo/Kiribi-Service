@@ -55,13 +55,18 @@ public class Session {
 	/** The service address associated with this session. */	
 	protected final ServiceAddress address;
 	
+	/** Indicates if this session was instantiated as a service session. */	
+	protected final boolean isServiceSession;
+	
 	/** The transponder associated with this session. */		
 	Transponder transponder;
-		
+	
+	/** The service admin associated with this session. */
 	ServiceAdmin admin;
+	
+	/** The scope associated with this session. */
 	Scope scope;
 	
-	private final boolean isServiceSession;
 	private boolean configured;
 	
 	// service 
@@ -233,7 +238,7 @@ public class Session {
 	}
 					
 	/**
-	 * Add a request handler to handler requests with the given message code.
+	 * Add a request handler to handle requests with the given message code.
 	 *
 	 * @param code The message code to handle.
 	 * @param handler A request handler.

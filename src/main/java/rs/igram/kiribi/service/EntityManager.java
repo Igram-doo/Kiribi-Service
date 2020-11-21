@@ -104,7 +104,7 @@ public final class EntityManager {
 	/**
 	 * Adds an entity.
 	 *
-	 * @param entity The entity to be addes.
+	 * @param entity The entity to be added.
 	 * @throws IOException if there was a problem adding the entity.
 	 */	
 	public void add(Entity entity) throws IOException {

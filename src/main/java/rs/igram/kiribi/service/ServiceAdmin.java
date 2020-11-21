@@ -88,8 +88,8 @@ public final class ServiceAdmin {
 	 * with the given arguents.
 	 *
 	 * @param key The key which will be associated with this service admin.
-	 * @param serverPort The upd port to accept connections on.
-	 * @param socketAddress The upd socket address to accept connections on.
+	 * @param serverPort The port to accept connections on.
+	 * @param socketAddress The socket address to accept connections on.
 	 */
 	public ServiceAdmin(Key key, int serverPort, SocketAddress socketAddress) { 
 		this.key = key;
@@ -112,9 +112,9 @@ public final class ServiceAdmin {
 	}
 	
 	/**
-	 * Returns the upd port of this service admin.
+	 * Returns the port of this service admin.
 	 *
-	 * @return The upd port of this service admin.
+	 * @return The port of this service admin.
 	 */	
 	public int serverPort() {
 		return serverPort;

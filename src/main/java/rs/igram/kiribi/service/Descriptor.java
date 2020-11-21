@@ -111,7 +111,7 @@ public final class Descriptor implements Encodable {
 	 * @param b The byte array to initialize from.
 	 * @throws IOException if there was a probem reading from the byte array.
 	 */
-	public Descriptor(byte[] b) throws IOException {
+	Descriptor(byte[] b) throws IOException {
 		this(new VarInputStream(b));
 	}
 
@@ -325,7 +325,7 @@ public final class Descriptor implements Encodable {
 	  	 * @param b The byte array to initialize from.
 	  	 * @throws IOException if there was a probem reading from the byte array.
 	  	 */
-		public Description(byte[] b) throws IOException {
+		Description(byte[] b) throws IOException {
 			this(new VarInputStream(b));
 		}
 

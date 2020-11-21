@@ -40,7 +40,7 @@ public class ServiceException extends Exception {
 		EXECUTION,
 		/** Indicates the task was interrupted. */	
 		INTERRUPTED,
-		/** Indicates an io problem. */	
+		/** Indicates an IO problem. */	
 		IO,
 		/** Indicates the task timed out. */	
 		TIMEOUT

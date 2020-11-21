@@ -55,9 +55,9 @@ public interface Service {
 	default String getTitle() {return getDescriptor().getDescription().getTitle();}
 	
 	/**
-	 * Returns the description of the service.
+	 * Returns a short description of the service.
 	 *
-	 * @return The description of the service.
+	 * @return A short description of the service.
 	 */	
 	default String getShortDescription() {return getDescriptor().getDescription().getDescription();}
 	
@@ -94,5 +94,5 @@ public interface Service {
 	 *
 	 * @return A new service session.
 	 */	
-	default Session newSession() {return null;}
+	Session newSession();
 }
