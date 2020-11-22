@@ -25,7 +25,7 @@
 /** 
  * Kiribi Service Package
  *
- * <p>Provides classes and interfaces to support networking.</p>
+ * <p>Provides classes and interfaces to support secure peer-to-peer networking.</p>
  *
  * @author Michael Sargent
  */
