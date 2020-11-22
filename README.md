@@ -1,6 +1,9 @@
 # Kiribi-Service
 Kiribi Peer-to-Peer Service Framework
 
+### Introduction
+Provides classes and interfaces to support secure peer-to-peer networking.
+
 ### Features
 
 ##### Network
@@ -36,7 +39,7 @@ To do
 ##### Entity Management
 To do
 
-### Example
+### Code Example
 To do
 
 ### Module Dependencies
