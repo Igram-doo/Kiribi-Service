@@ -147,28 +147,6 @@ class ServiceTest {
 		return privateKey.address();
 	}
 	
-	static class Listener implements CompletionListener<Entity> {
-		CountDownLatch latch;
-		
-		Listener() {}
-		
-		Listener(CountDownLatch latch) {
-			this.latch = latch;
-		}
-		
-		@Override
-		public void completed(Entity entity) {
-			System.out.println("Completed: " + entity);
-			if (latch != null) latch.countDown();
-		}
-		
-		@Override
-		public void failed(Throwable t) {
-			t.printStackTrace();
-			if (latch != null) latch.countDown();
-		}
-	}
-			
 	static class TestServiceSession extends Session {
 		TestServiceSession(Service service) {
 			super(service);
