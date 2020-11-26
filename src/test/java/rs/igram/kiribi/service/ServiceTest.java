@@ -62,8 +62,6 @@ import rs.igram.kiribi.service.util.*;
  * @author Michael Sargent
  */
 class ServiceTest {
-//	static final Key KEY1 = Key.generate();
-//	static final Key KEY2 = Key.generate();
 	static final PrivateKey KEY1 = Key.generateKeyPair().getPrivate();
 	static final PrivateKey KEY2 = Key.generateKeyPair().getPrivate();
 	
@@ -146,8 +144,7 @@ class ServiceTest {
 	
 	static Address address(PrivateKey key) {
 		Key.Private privateKey = (Key.Private)key;
-		Key.Public publicKey = (Key.Public)(privateKey.generateKeyPair().getPublic());
-		return publicKey.address();
+		return privateKey.address();
 	}
 	
 	static class Listener implements CompletionListener<Entity> {

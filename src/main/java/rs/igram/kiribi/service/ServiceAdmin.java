@@ -85,30 +85,7 @@ public final class ServiceAdmin {
 			throw new RuntimeException("Could not initialize secure random",e);
 		}
 	}
-	
-	/**
-	 * Initializes a newly created <code>ServiceAdmin</code> object
-	 * with the given arguents.
-	 *
-	 * @deprecated Use {@link #ServiceAdmin(PrivateKey, int, SocketAddress)}.
-	 * @param key The private key which will be associated with this service admin.
-	 * @param serverPort The port to accept connections on.
-	 * @param socketAddress The socket address to accept connections on.
-	 */
-	@Deprecated
-	public ServiceAdmin(Key key, int serverPort, SocketAddress socketAddress) { 
-		this.key = key;
-		this.privateKey = null;
-		this.serverPort = serverPort;
-		this.socketAddress = socketAddress;
-		this.address = key.address();
-		
-		System.out.println("Address: "+address);
-		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);
-		server = new SessionServer(serverPort, this, endpointProvider);
-		executor.onShutdown(1, this::shutdown);
-	}
-	
+
 	/**
 	 * Initializes a newly created <code>ServiceAdmin</code> object
 	 * with the given arguents.
