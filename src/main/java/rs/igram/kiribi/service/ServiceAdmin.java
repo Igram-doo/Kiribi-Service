@@ -65,7 +65,7 @@ import static java.util.Collections.singleton;
 public final class ServiceAdmin {
 	private static final SecureRandom random;	
 	
-	private final Key key;
+//	private final Key key;
 	private final Key.Private privateKey;
 	private final Address address;
 	private final int serverPort;	
@@ -96,7 +96,6 @@ public final class ServiceAdmin {
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
 	public ServiceAdmin(PrivateKey key, int serverPort, SocketAddress socketAddress) { 
-		this.key = null;
 		this.privateKey = (Key.Private)key;
 		this.serverPort = serverPort;
 		this.socketAddress = socketAddress;
@@ -146,11 +145,7 @@ public final class ServiceAdmin {
 	// -------------- key stuff ------------------------------------------------	
 	
 	SignedData signData(byte[] data) throws IOException {
-		if (key != null) {
-			return key.signData(data);
-		} else {
-			return privateKey.signData(data);
-		}
+		return privateKey.signData(data);
 	}
 	
 	/**
