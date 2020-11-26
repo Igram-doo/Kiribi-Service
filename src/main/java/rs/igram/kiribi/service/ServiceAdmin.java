@@ -27,6 +27,7 @@ package rs.igram.kiribi.service;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +66,8 @@ public final class ServiceAdmin {
 	private static final SecureRandom random;	
 	
 	private final Key key;
+	private final Key.Private privateKey;
+	private final Address address;
 	private final int serverPort;	
 	private final Map<Address,InetSocketAddress> cache = new HashMap<>();
 	private final SessionServer server;
@@ -87,17 +90,43 @@ public final class ServiceAdmin {
 	 * Initializes a newly created <code>ServiceAdmin</code> object
 	 * with the given arguents.
 	 *
-	 * @param key The key which will be associated with this service admin.
+	 * @deprecated Use {@link #ServiceAdmin(PrivateKey, int, SocketAddress)}.
+	 * @param key The private key which will be associated with this service admin.
 	 * @param serverPort The port to accept connections on.
 	 * @param socketAddress The socket address to accept connections on.
 	 */
+	@Deprecated
 	public ServiceAdmin(Key key, int serverPort, SocketAddress socketAddress) { 
 		this.key = key;
+		this.privateKey = null;
 		this.serverPort = serverPort;
 		this.socketAddress = socketAddress;
+		this.address = key.address();
 		
-		System.out.println("Key: "+key.address());
-		endpointProvider = EndpointProvider.udpProvider(executor, key, socketAddress);
+		System.out.println("Address: "+address);
+		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);
+		server = new SessionServer(serverPort, this, endpointProvider);
+		executor.onShutdown(1, this::shutdown);
+	}
+	
+	/**
+	 * Initializes a newly created <code>ServiceAdmin</code> object
+	 * with the given arguents.
+	 *
+	 * @param key The private key which will be associated with this service admin.
+	 * @param serverPort The port to accept connections on.
+	 * @param socketAddress The socket address to accept connections on.
+	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
+	 */
+	public ServiceAdmin(PrivateKey key, int serverPort, SocketAddress socketAddress) { 
+		this.key = null;
+		this.privateKey = (Key.Private)key;
+		this.serverPort = serverPort;
+		this.socketAddress = socketAddress;
+		this.address = ((Key.Public)(privateKey.generateKeyPair().getPublic())).address();
+		
+		System.out.println("Address: "+address);
+		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);
 		server = new SessionServer(serverPort, this, endpointProvider);
 		executor.onShutdown(1, this::shutdown);
 	}
@@ -138,20 +167,13 @@ public final class ServiceAdmin {
 	}
 
 	// -------------- key stuff ------------------------------------------------	
-	Key key() {
-		return key;
-	}
-
-	Key publicKey() {
-		return key().pub();
-	}
-	
-	Signature sign(byte[] data) throws IOException {
-		return key().sign(data);
-	}
 	
 	SignedData signData(byte[] data) throws IOException {
-		return key().signData(data);
+		if (key != null) {
+			return key.signData(data);
+		} else {
+			return privateKey.signData(data);
+		}
 	}
 	
 	/**
@@ -160,7 +182,7 @@ public final class ServiceAdmin {
 	 * @return A new service address with a random service id and this service admin's address.
 	 */	
 	public ServiceAddress address() {
-		return new ServiceAddress(new ServiceId(), key().address());
+		return new ServiceAddress(new ServiceId(), address);
 	}
 	
 	/**
@@ -170,7 +192,7 @@ public final class ServiceAdmin {
 	 * @return A new service address with the given service id and this service admin's address.
 	 */	
 	public ServiceAddress address(ServiceId id) {
-		return new ServiceAddress(id, key().address());
+		return new ServiceAddress(id, address);
 	}
 
 	// -------------- Activation ----------------------------------------------

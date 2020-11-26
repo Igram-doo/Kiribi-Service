@@ -35,7 +35,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import rs.igram.kiribi.crypto.Address;
-import rs.igram.kiribi.crypto.Key;
 import rs.igram.kiribi.net.ConnectionState;
 import rs.igram.kiribi.net.Endpoint;
 import rs.igram.kiribi.net.NetworkExecutor;

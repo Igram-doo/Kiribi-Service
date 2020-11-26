@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import rs.igram.kiribi.io.EncodedStream;
 import rs.igram.kiribi.crypto.Address;
 import rs.igram.kiribi.crypto.Challenge;
-import rs.igram.kiribi.crypto.Key;
 import rs.igram.kiribi.crypto.Signature;
 import rs.igram.kiribi.crypto.SignedData;
 
@@ -80,44 +79,7 @@ abstract class Authenticator {
 			return true;
 		}
 	}
-	
-	private static boolean authenticateSystemServer(Key key, boolean isProxy, EncodedStream stream, Key serverPK) throws IOException {
-		if(isProxy){
-			Challenge challenge = new Challenge();
-			stream.write(challenge);
-			Signature sig = stream.read(Signature::new);
-			return challenge.verify(sig, serverPK);
-		}else{
-			Challenge challenge = stream.read(Challenge::new);
-			stream.write(key.sign(challenge.encode()));
-			return true;
-		}
-	}
-	
-	// system services - directory, router, etc
-	static final class SystemAuthenticator extends Authenticator {
-		private final Key key;
-		private final Key systemServerPK;
-		
-		public SystemAuthenticator(Key key, Key systemServerPK) {
-			this.key = key;
-			this.systemServerPK = systemServerPK;
-		}
-		
-		public static Supplier<Authenticator> factory(Key key, Key systemServerPK) {
-			return () -> new SystemAuthenticator(key, systemServerPK);
-		}
-		
-		@Override
-		public boolean authenticate(boolean isProxy, EncodedStream stream) {
-			try{
-				return authenticateSystemServer(key, isProxy, stream, systemServerPK);
-			}catch(IOException e){
-				return false;
-			}
-		}
-	}
-	
+
 	// public services
 	static final class PublicAuthenticator extends Authenticator {
 		private final ServiceAddress address;
@@ -193,51 +155,6 @@ abstract class Authenticator {
 		
 		public static Supplier<Authenticator> factory(ServiceAddress address, EntityManager mgr) {
 			return () -> new RestrictedAuthenticator(address, mgr);
-		}
-	}
-		
-	// admin authentication
-	static final class AdminAuthenticator extends Authenticator {
-		private final Key key;
-		private final Key systemServerPK;
-		private final byte[] pk;
-		
-		public AdminAuthenticator(Key key, byte[] pk, Key systemServerPK) {
-			this.key = key;
-			this.systemServerPK = systemServerPK;
-			this.pk = pk;
-		}
-		
-		private boolean authenticate(Address addr) {
-			Key apk = Key.publicKey(pk);
-			return apk.address().equals(addr);
-		}
-		
-		@Override
-		public boolean authenticate(boolean isProxy, EncodedStream stream) {
-			try{
-				if(!authenticateSystemServer(key, isProxy, stream, systemServerPK)) return false;
-				if(isProxy){
-					Challenge challenge = stream.read(Challenge::new);
-					stream.write(key.signData(challenge.encode()));					
-					return true;
-				}else{
-					Challenge challenge = new Challenge();
-					stream.write(challenge);					
-					SignedData data = stream.read(SignedData::new);
-					if(!challenge.verify(data, data.address())) return false;
-					return authenticate(data.address());
-				}
-			}catch(IOException e){
-				return false;
-			}catch(Exception e){
-				e.printStackTrace();
-				return false;
-			}
-		}
-		
-		public static Supplier<Authenticator> factory(Key key, byte[] pk, Key systemServerPK) {
-			return () -> new AdminAuthenticator(key, pk, systemServerPK);
 		}
 	}
 }

@@ -30,6 +30,7 @@ import java.io.PipedOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,8 +62,10 @@ import rs.igram.kiribi.service.util.*;
  * @author Michael Sargent
  */
 class ServiceTest {
-	static final Key KEY1 = Key.generate();
-	static final Key KEY2 = Key.generate();
+//	static final Key KEY1 = Key.generate();
+//	static final Key KEY2 = Key.generate();
+	static final PrivateKey KEY1 = Key.generateKeyPair().getPrivate();
+	static final PrivateKey KEY2 = Key.generateKeyPair().getPrivate();
 	
 	static final int PORT1 = 7700;
 	static final int PORT2 = 7701;
@@ -116,13 +119,12 @@ class ServiceTest {
 		admin1.shutdown();
 		admin2.shutdown();
 		server.shutdown();
-		//Thread.sleep(3000);
 	}
 	
 	void configureEntities(Scope scope) throws Exception {
 		CountDownLatch latch = new CountDownLatch(2);
-		bob = new Entity(true, KEY2.address().toString(), BOB);
-		alice = new Entity(true, KEY1.address().toString(), ALICE);
+		bob = new Entity(true, address(KEY2).toString(), BOB);
+		alice = new Entity(true, address(KEY1).toString(), ALICE);
 		
 		ServiceAddress address = admin1.address(ID); 
 		TestService service = new TestService(address, scope);
@@ -140,6 +142,12 @@ class ServiceTest {
 		Thread.sleep(3000);
 		
 		latch.await();
+	}
+	
+	static Address address(PrivateKey key) {
+		Key.Private privateKey = (Key.Private)key;
+		Key.Public publicKey = (Key.Public)(privateKey.generateKeyPair().getPublic());
+		return publicKey.address();
 	}
 	
 	static class Listener implements CompletionListener<Entity> {
