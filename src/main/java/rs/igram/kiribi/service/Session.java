@@ -228,13 +228,13 @@ public class Session {
 	 * Submit a request message for processing.
 	 *
 	 * @param request The request message.
-	 * @param l A response listener.
+	 * @param listeners An array of response listeners each with a different code.
 	 * @throws IOException if there was a probem during the request.
 	 */
-	protected final void request(Message request, ResponseListener l) throws IOException {
+	protected final void request(Message request, ResponseListener... listeners) throws IOException {
 		// should have notified session earlier, eg, auth failed, but handle here just in case
 		if(transponder == null) throw new IOException("Not connected");
-		transponder.request(request, l);
+		transponder.request(request, listeners);
 	}
 					
 	/**
