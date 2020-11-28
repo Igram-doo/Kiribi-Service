@@ -379,5 +379,10 @@ public class Session {
 				if(errorHandler != null) errorHandler.error("Problem: "+t.getMessage());
 			}
 		}
+		
+		@Override
+		public byte code() {
+			return code;
+		}
 	}
 }

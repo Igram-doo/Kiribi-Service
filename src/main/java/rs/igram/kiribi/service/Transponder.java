@@ -51,7 +51,7 @@ final class Transponder implements Consumer<ConnectionState> {
 	private static final byte RESPONSE = 1;
 	private Set<Transponder> transponders;
 
-	private final Map<Long, ResponseListener> activeRequests = new HashMap<Long, ResponseListener>();
+	private final Map<Long, ResponseListener[]> activeRequests = new HashMap<Long, ResponseListener[]>();
 	
 	Endpoint endpoint;
 	Authenticator authenticator;
@@ -139,7 +139,7 @@ final class Transponder implements Consumer<ConnectionState> {
 
 	boolean isOpen() {return endpoint == null ? false : endpoint.isOpen();}
 		
-	void request(Message request, ResponseListener l) throws IOException {
+	void request(Message request, ResponseListener... l) throws IOException {
 		if(l != null) activeRequests.put(request.uid, l);
 		request(request);
 	}
@@ -165,12 +165,21 @@ final class Transponder implements Consumer<ConnectionState> {
 	}
 
 	private void processIncomingResponse(Message response){
-		ResponseListener l = activeRequests.remove(response.uid);
-		if(l != null) 
+		ResponseListener l = filter(response.code(), activeRequests.remove(response.uid));
+		if(l != null) {
 			executor.submit(() -> l.response(response));
-		
+		}
 	}
 
+	private static ResponseListener filter(byte code, ResponseListener[] listeners) {
+		if (listeners == null) return null;
+		for (ResponseListener l : listeners) {
+			if (l.code() == code) return l;
+		}
+		
+		return null;
+	}
+	
 	private void read() {
 		while(!Thread.currentThread().isInterrupted() && endpoint.isOpen()){
 			try{

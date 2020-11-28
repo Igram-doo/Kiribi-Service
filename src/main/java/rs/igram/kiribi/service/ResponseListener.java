@@ -44,4 +44,11 @@ public interface ResponseListener {
 	 * @param msg The error string to process.
 	 */
 	default void error(String msg){}
+	
+	/**
+	 * Returns the response code this listener will process.
+	 *
+	 * @return The response code this listener will process.
+	 */
+	default byte code() { return 0x00; }
 }
