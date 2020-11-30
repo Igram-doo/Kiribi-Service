@@ -44,8 +44,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import rs.igram.kiribi.crypto.Address;
-import rs.igram.kiribi.crypto.Key;
-import rs.igram.kiribi.crypto.Signature;
+import rs.igram.kiribi.crypto.EC25519PrivateKey;
+import rs.igram.kiribi.crypto.EC25519PublicKey;
 import rs.igram.kiribi.crypto.SignedData;
 import rs.igram.kiribi.net.ConnectionAddress;
 import rs.igram.kiribi.net.Endpoint;
@@ -66,7 +66,7 @@ public final class ServiceAdmin {
 	private static final SecureRandom random;	
 	
 //	private final Key key;
-	private final Key.Private privateKey;
+	private final EC25519PrivateKey privateKey;
 	private final Address address;
 	private final int serverPort;	
 	private final Map<Address,InetSocketAddress> cache = new HashMap<>();
@@ -96,10 +96,10 @@ public final class ServiceAdmin {
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
 	public ServiceAdmin(PrivateKey key, int serverPort, SocketAddress socketAddress) { 
-		this.privateKey = (Key.Private)key;
+		this.privateKey = (EC25519PrivateKey)key;
 		this.serverPort = serverPort;
 		this.socketAddress = socketAddress;
-		this.address = ((Key.Public)(privateKey.generateKeyPair().getPublic())).address();
+		this.address = privateKey.address();
 		
 		System.out.println("Address: "+address);
 		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);

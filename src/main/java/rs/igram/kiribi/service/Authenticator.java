@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import rs.igram.kiribi.io.EncodedStream;
 import rs.igram.kiribi.crypto.Address;
 import rs.igram.kiribi.crypto.Challenge;
-import rs.igram.kiribi.crypto.Signature;
 import rs.igram.kiribi.crypto.SignedData;
 
 /**

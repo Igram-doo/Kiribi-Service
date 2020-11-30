@@ -39,8 +39,6 @@ import java.util.function.Supplier;
 
 import rs.igram.kiribi.service.util.ConsumerSupport;
 import rs.igram.kiribi.crypto.Address;
-import rs.igram.kiribi.crypto.Signature;
-import rs.igram.kiribi.crypto.SignedData;
 import rs.igram.kiribi.io.VarInput;
 import rs.igram.kiribi.io.VarOutput;
 import rs.igram.kiribi.net.Endpoint;

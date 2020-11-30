@@ -62,8 +62,8 @@ import rs.igram.kiribi.service.util.*;
  * @author Michael Sargent
  */
 class ServiceTest {
-	static final PrivateKey KEY1 = Key.generateKeyPair().getPrivate();
-	static final PrivateKey KEY2 = Key.generateKeyPair().getPrivate();
+	static final PrivateKey KEY1 = KeyPairGenerator.generateKeyPair().getPrivate();
+	static final PrivateKey KEY2 = KeyPairGenerator.generateKeyPair().getPrivate();
 	
 	static final int PORT1 = 7700;
 	static final int PORT2 = 7701;
@@ -143,7 +143,7 @@ class ServiceTest {
 	}
 	
 	static Address address(PrivateKey key) {
-		Key.Private privateKey = (Key.Private)key;
+		EC25519PrivateKey privateKey = (EC25519PrivateKey)key;
 		return privateKey.address();
 	}
 	
