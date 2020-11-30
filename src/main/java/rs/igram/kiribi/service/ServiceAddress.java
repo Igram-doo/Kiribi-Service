@@ -26,7 +26,7 @@ package rs.igram.kiribi.service;
 
 import java.io.IOException;
 
-import rs.igram.kiribi.crypto.Address;
+import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.io.Encodable;
 import rs.igram.kiribi.io.VarInput;
 import rs.igram.kiribi.io.VarOutput;

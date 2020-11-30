@@ -27,7 +27,7 @@ package rs.igram.kiribi.service;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.PrivateKey;
+import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import rs.igram.kiribi.crypto.Address;
+import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.crypto.EC25519PrivateKey;
 import rs.igram.kiribi.crypto.EC25519PublicKey;
 import rs.igram.kiribi.crypto.SignedData;
@@ -90,16 +90,16 @@ public final class ServiceAdmin {
 	 * Initializes a newly created <code>ServiceAdmin</code> object
 	 * with the given arguents.
 	 *
-	 * @param key The private key which will be associated with this service admin.
+	 * @param pair The key pair which will be associated with this service admin.
 	 * @param serverPort The port to accept connections on.
 	 * @param socketAddress The socket address to accept connections on.
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
-	public ServiceAdmin(PrivateKey key, int serverPort, SocketAddress socketAddress) { 
-		this.privateKey = (EC25519PrivateKey)key;
+	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress socketAddress) { 
+		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
 		this.serverPort = serverPort;
 		this.socketAddress = socketAddress;
-		this.address = privateKey.address();
+		this.address = new Address(pair.getPublic());
 		
 		System.out.println("Address: "+address);
 		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);

@@ -25,12 +25,20 @@
 package rs.igram.kiribi.service;
 
 import java.io.IOException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import rs.igram.kiribi.io.Encodable;
+import rs.igram.kiribi.io.VarInput; 
+import rs.igram.kiribi.io.VarOutput;
 import rs.igram.kiribi.io.EncodedStream;
-import rs.igram.kiribi.crypto.Address;
-import rs.igram.kiribi.crypto.Challenge;
+import rs.igram.kiribi.net.Address;
+import rs.igram.kiribi.crypto.EC25519PublicKey;
+import rs.igram.kiribi.crypto.Signature;
 import rs.igram.kiribi.crypto.SignedData;
 
 /**
@@ -39,6 +47,16 @@ import rs.igram.kiribi.crypto.SignedData;
  * @author Michael Sargent
  */
 abstract class Authenticator {
+	static final SecureRandom random;
+
+ 	static {
+		try{
+			random = SecureRandom.getInstance("SHA1PRNG", "SUN"); 
+		}catch(Exception e){
+			throw new RuntimeException("Could not initialize secure random",e);
+		}
+	}
+	
 	Entity entity;
 	
 	private Authenticator() {}
@@ -144,8 +162,9 @@ abstract class Authenticator {
 					Challenge challenge = new Challenge();
 					stream.write(challenge);					
 					SignedData data = stream.read(SignedData::new);
-					if(!challenge.verify(data, data.address())) return false;
-					return authenticate(data.address());
+					Address addr = new Address(data.getPubKey());
+					if(!challenge.verify(data, addr)) return false;
+					return authenticate(addr);
 				}
 			}catch(IOException e){
 				return false;
@@ -154,6 +173,67 @@ abstract class Authenticator {
 		
 		public static Supplier<Authenticator> factory(ServiceAddress address, EntityManager mgr) {
 			return () -> new RestrictedAuthenticator(address, mgr);
+		}
+	}
+	
+	private static final class Challenge implements Encodable {
+		static final int SIZE = 16;
+		private final byte[] b = new byte[SIZE];
+	
+		Challenge() {
+			random.nextBytes(b);
+		}
+	
+		Challenge(byte[] bytes) {
+			System.arraycopy(bytes, 0, b, 0, SIZE);
+		}
+		
+		Challenge(VarInput in) throws IOException {
+			in.readFully(b);
+		}
+
+		@Override
+		public void write(VarOutput out) throws IOException {out.write(b);}
+	
+		boolean verify(SignedData data, Address address) {
+			try{
+				Address addr = new Address(data.getPubKey());
+				return data.verify() && address.equals(addr) && Arrays.equals(b, data.data());
+			}catch(IOException e){
+				return false;
+			}
+		}
+	
+		boolean verify(Signature sig, PublicKey key) {
+			if (key instanceof EC25519PublicKey) {
+				try{
+					return ((EC25519PublicKey)key).verify(sig, b);
+				}catch(IOException e){
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+	
+		@Override
+		public byte[] encode() throws IOException {
+			byte[] encoded = new byte[SIZE];
+			System.arraycopy(b, 0, encoded, 0, SIZE);
+			return encoded;
+		}
+	
+		@Override
+		public String toString(){return Base64.getEncoder().encodeToString(b);}
+
+		@Override
+		public int hashCode(){return Arrays.hashCode(b);}
+
+		@Override
+		public boolean equals(Object o){
+			if(this == o) return true;
+			if(o == null || o.getClass() != Challenge.class) return false;
+			return Arrays.equals(b, ((Challenge)o).b);
 		}
 	}
 }

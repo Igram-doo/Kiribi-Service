@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import rs.igram.kiribi.crypto.Address;
+import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.io.Encodable;
 import rs.igram.kiribi.io.VarInput; 
 import rs.igram.kiribi.io.VarInputStream; 

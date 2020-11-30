@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import rs.igram.kiribi.service.util.ConsumerSupport;
-import rs.igram.kiribi.crypto.Address;
+import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.io.VarInput;
 import rs.igram.kiribi.io.VarOutput;
 import rs.igram.kiribi.net.Endpoint;
@@ -147,10 +147,7 @@ public final class EntityManager {
 	
 	private ExchangeSession session(CompletionListener<Entity> handler, Entity entity) {
 		ServiceAddress address = new ServiceAddress(ServiceId.ENTITY, entity.address());
-		return new ExchangeSession(
-					handler, 
-					address
-				);
+		return new ExchangeSession(handler, address);
 	}
 	
 	/**

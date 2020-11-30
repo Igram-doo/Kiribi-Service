@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import rs.igram.kiribi.crypto.Address;
+import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.net.Endpoint;
 import rs.igram.kiribi.net.NetworkExecutor;
 

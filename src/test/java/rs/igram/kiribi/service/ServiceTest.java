@@ -30,7 +30,8 @@ import java.io.PipedOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.PrivateKey;
+import java.security.KeyPair;
+//import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,9 +51,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import rs.igram.kiribi.crypto.*;
+import rs.igram.kiribi.crypto.KeyPairGenerator;
 import rs.igram.kiribi.io.*;
-import rs.igram.kiribi.net.*;
+import rs.igram.kiribi.net.Address;
+import rs.igram.kiribi.net.NetworkExecutor;
+import rs.igram.kiribi.net.NetworkMonitor;
 import rs.igram.kiribi.net.natt.*;
 import rs.igram.kiribi.service.util.*;
 
@@ -62,12 +65,12 @@ import rs.igram.kiribi.service.util.*;
  * @author Michael Sargent
  */
 class ServiceTest {
-	static final PrivateKey KEY1 = KeyPairGenerator.generateKeyPair().getPrivate();
-	static final PrivateKey KEY2 = KeyPairGenerator.generateKeyPair().getPrivate();
+	static final KeyPair PAIR1 = KeyPairGenerator.generateKeyPair();
+	static final KeyPair PAIR2 = KeyPairGenerator.generateKeyPair();
 	
-	static final int PORT1 = 7700;
-	static final int PORT2 = 7701;
-	static final int PORT3 = 7702;
+	static final int PORT1 = 8700;
+	static final int PORT2 = 8701;
+	static final int PORT3 = 8702;
 	
 	static final InetAddress LOCAL_HOST;
 	static {
@@ -106,8 +109,8 @@ class ServiceTest {
 		NetworkMonitor.monitor(executor);
 		server = new NATTServer();
 		server.start(LOCAL_HOST, NATTServer.SERVER_PORT);
-		admin1 = new ServiceAdmin(KEY1, PORT1, SA1);
-		admin2 = new ServiceAdmin(KEY2, PORT2, SA2);
+		admin1 = new ServiceAdmin(PAIR1, PORT1, SA1);
+		admin2 = new ServiceAdmin(PAIR2, PORT2, SA2);
 		
 		mgr1 = admin1.entityManager(new ArrayList<Entity>());
 		mgr2 = admin2.entityManager(new ArrayList<Entity>());
@@ -121,8 +124,8 @@ class ServiceTest {
 	
 	void configureEntities(Scope scope) throws Exception {
 		CountDownLatch latch = new CountDownLatch(2);
-		bob = new Entity(true, address(KEY2).toString(), BOB);
-		alice = new Entity(true, address(KEY1).toString(), ALICE);
+		bob = new Entity(true, address(PAIR2).toString(), BOB);
+		alice = new Entity(true, address(PAIR1).toString(), ALICE);
 		
 		ServiceAddress address = admin1.address(ID); 
 		TestService service = new TestService(address, scope);
@@ -142,9 +145,8 @@ class ServiceTest {
 		latch.await();
 	}
 	
-	static Address address(PrivateKey key) {
-		EC25519PrivateKey privateKey = (EC25519PrivateKey)key;
-		return privateKey.address();
+	static rs.igram.kiribi.net.Address address(KeyPair pair) {
+		return new rs.igram.kiribi.net.Address(pair.getPublic());
 	}
 	
 	static class TestServiceSession extends Session {
