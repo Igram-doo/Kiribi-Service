@@ -2,47 +2,58 @@
 Kiribi Peer-to-Peer Service Framework
 
 ### Introduction
-Provides classes and interfaces to support secure peer-to-peer networking.
+Provides classes and interfaces for building a secure service based peer-to-peer network.
 
 ### Features
-
-##### Network
-Each peer only requires a single open upd port on the host device. NAT transversal and peer-to-peer network communication is provided by the [Kiribi-Net](http://github.com/Igram-doo/Kiribi-Net) module.
-
-##### Security
-Encryption and authentication between peers is provided by the [Kiribi-Crypto](http://github.com/Igram-doo/Kiribi-Crypto) module.
+* Each peer only requires a single open upd port on the host device. NAT transversal and peer-to-peer network communication is provided by the [Kiribi-Net](http://github.com/Igram-doo/Kiribi-Net) module.
+* Encryption and authentication between peers is provided by the [Kiribi-Crypto](http://github.com/Igram-doo/Kiribi-Crypto) module.
 
 ### Overview
-Provides classes and interfaces to support secure peer-to-peer networking.
+Provides classes and interfaces for building a secure service based peer-to-peer network.
 
 ##### Addresses
-To do
+Each peer maintains a unique *Address*. Addresses are instantiated with a crypto-graphic public key to ensure they are unique.
+
+##### ServiceAddresses
+Each *Service* maintains a unique *ServiceAddress* consisting of the peer's Address and a unique long value.
 
 ##### Services
-To do
+Each *Service* provides descriptive information about the service and a factory method for creating server sessions to handle incoming requests.
 
 ##### Scope
-To do
+Services have one of three possible scopes:
+
+* **Private**	
+Local only.
+* **Restricted**  
+Require aunthentication and to have been explicitly granted access.
+* **Public**  
+Require aunthentication.
 
 ##### Sessions
-To do
+Sessions define which *Requests* and *Responses* a service supports. Sessions can be instantiated in one of two modes:
+
+* **Client Session**  
+  Connects to the *ServiceAddress* of a remote service.
+* **Server Session**  
+  Accepts connections from *Client Sessions*.
 
 ##### Messages
-To do
-
-##### Entities
-To do
+*Messages* encapsulate data sent and received by *Sessions*.
 
 ##### Service Administration
-To do
+Provides methods to manage services.
+
+##### Entities
+Entities encapsulate which services a remote peer has made available to us as well as which services we have made available to that peer.
 
 ##### Entity Management
-To do
+Provides methods to manage entities. Includes a mechanism to publish available services to remote peers.
 
-### Code Example
+### Code Examples
 Protocol
 
-	class Protocol {
+	class AddProtocol {
 		static final byte ADD = 0x01;	// request code
 		static final byte ADDED = 0x01;	// response code
 	}
@@ -55,15 +66,16 @@ Service Session
 		}
 		
 		protected void configure() {
-			handle(Protocol.ADD, this::add);
+			handle(AddProtocol.ADD, this::add);
 		}
 		
 		// ---- responses ----
 		Message add(Message request) throws IOException {
-			long a = request.in().readLong();
-			long b = request.in().readLong();
+			VarInput in = request.in();
+			long a = in.readLong();
+			long b = in.readLong();
 			long result = a + b;
-			Message response = request.respond(Protocol.ADDED);
+			Message response = request.respond(AddProtocol.ADDED);
 			response.out().writeLong(result);
 		
 			return response;
@@ -88,9 +100,10 @@ Client Session
 		
 		private Future<Long> add(long a, long b) throws IOException {
 			final CompletableFuture<Long> future = new CompletableFuture<Long>();
-			Message request = Message.request(Protocol.ADD);
-			request.out().writeLong(a);
-			request.out().writeLong(b);
+			Message request = Message.request(AddProtocol.ADD);
+			VarOutput out = request.out();
+			out.writeLong(a);
+			out.writeLong(b);
 			request(
 				request, 
 				new ResponseAdapter(
@@ -122,6 +135,7 @@ Service
 
 ### Module Dependencies
 ##### Requires
+* java.base
 * rs.igram.kiribi.io
 * rs.igram.kiribi.crypto
 * rs.igram.kiribi.net
@@ -129,8 +143,8 @@ Service
 ##### Exports
 * rs.igram.kiribi.service
 
-### Requirements
-To do
+### To Do
+* Determine minimum supported Java version.
 
 ### Known Issues
-To do
+Shutdown does work properly.
