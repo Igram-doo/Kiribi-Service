@@ -162,7 +162,7 @@ abstract class Authenticator {
 					Challenge challenge = new Challenge();
 					stream.write(challenge);					
 					SignedData data = stream.read(SignedData::new);
-					Address addr = new Address(data.getPubKey());
+					Address addr = new Address(data.getPublicKey());
 					if(!challenge.verify(data, addr)) return false;
 					return authenticate(addr);
 				}
@@ -197,23 +197,15 @@ abstract class Authenticator {
 	
 		boolean verify(SignedData data, Address address) {
 			try{
-				Address addr = new Address(data.getPubKey());
-				return data.verify() && address.equals(addr) && Arrays.equals(b, data.data());
+				Address addr = new Address(data.getPublicKey());
+				return data.verify(data.getPublicKey()) && address.equals(addr) && Arrays.equals(b, data.data());
 			}catch(IOException e){
 				return false;
 			}
 		}
 	
 		boolean verify(Signature sig, PublicKey key) {
-			if (key instanceof EC25519PublicKey) {
-				try{
-					return ((EC25519PublicKey)key).verify(sig, b);
-				}catch(IOException e){
-					return false;
-				}
-			} else {
-				return false;
-			}
+			return sig.verify(b, key);
 		}
 	
 		@Override
