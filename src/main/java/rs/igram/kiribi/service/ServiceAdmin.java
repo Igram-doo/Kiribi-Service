@@ -144,7 +144,7 @@ public final class ServiceAdmin {
 	// -------------- key stuff ------------------------------------------------	
 	
 	SignedData signData(byte[] data) throws IOException {
-		return privateKey.signData(data);
+		return SignedData.signData(data, privateKey);
 	}
 	
 	/**
