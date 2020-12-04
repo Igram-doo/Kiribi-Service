@@ -138,9 +138,17 @@ public final class EntityManager {
 					session.connect(admin);
 				}
 				session.exchange(entity, 15);
-			}catch(Exception e){
-				e.printStackTrace();
-				// peer could be offline - just eat exception
+			}catch(ServiceException e){
+				switch(e.type) {
+				case INTERRUPTED :
+					// System.out.println("INTERRUPTED");
+					// shutdown - ignore 
+					break;
+				default:
+					// System.out.println("DEFAULT");
+					// peer could be offline - just eat exception
+					break;
+				}
 			}
 		});		
 	}
@@ -280,22 +288,25 @@ public final class EntityManager {
 					SERVICE_RESPONSE_DATA_EXCHANGE, 
 					response -> {
 						try{
-						System.out.println("EntityManager.proxy.exchange SUCCESS1: ");
-						VarInput in = response.in();
-						if(in.readBoolean()){
-							Entity.ExchangeData d = new Entity.ExchangeData(in);
-							entity.exchange(d);
-							update(entity, true);
-							//System.out.println("ER1: " + entity + " " + entity.imported);
-						}else{
-							update(entity, true);
-							//System.out.println("ER2: " + entity.imported);
-						}	
+							System.out.println("EntityManager.proxy.exchange SUCCESS1: ");
+							VarInput in = response.in();
+							if(in.readBoolean()){
+								Entity.ExchangeData d = new Entity.ExchangeData(in);
+								entity.exchange(d);
+								update(entity, true);
+								//System.out.println("ER1: " + entity + " " + entity.imported);
+							}else{
+								update(entity, true);
+								//System.out.println("ER2: " + entity.imported);
+							}	
 
-						future.complete(null);
-						System.out.println("EntityManager.proxy.exchange SUCCESS2: ");
-						}catch(Exception e){
-							e.printStackTrace();
+							future.complete(null);
+							System.out.println("EntityManager.proxy.exchange SUCCESS2: ");
+						
+							// shutdown - ignore 
+							
+						}catch(IOException e){
+							future.completeExceptionally(e);
 						}
 					},
 					error -> {

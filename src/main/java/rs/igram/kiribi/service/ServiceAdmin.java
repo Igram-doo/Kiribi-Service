@@ -65,7 +65,6 @@ import static java.util.Collections.singleton;
 public final class ServiceAdmin {
 	private static final SecureRandom random;	
 	
-//	private final Key key;
 	private final EC25519PrivateKey privateKey;
 	private final Address address;
 	private final int serverPort;	
@@ -207,10 +206,11 @@ public final class ServiceAdmin {
 	 * Shuts down this service admin and all active services.
 	 */	
 	public void shutdown() {
-//		if(mgr != null) mgr.shutdown();
-		RetryTask.shutdown();
-		if(server != null) server.shutdown();
-		endpointProvider.shutdown();
-		System.out.println("ServiceAdmin.shutdown");
+		synchronized (this) {
+			RetryTask.shutdown();
+			if(server != null) server.shutdown();
+			endpointProvider.shutdown();
+			System.out.println("ServiceAdmin: shutdown");
+		}
 	}	
 }

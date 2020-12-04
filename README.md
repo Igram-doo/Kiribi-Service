@@ -146,5 +146,3 @@ Service
 ### To Do
 * Determine minimum supported Java version.
 
-### Known Issues
-* Shutdown does work properly. Probably due to open exchange session...
