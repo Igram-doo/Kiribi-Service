@@ -23,7 +23,7 @@ Each *Service* provides descriptive information about the service and a factory 
 ##### Scope
 Services have one of three possible scopes:
 
-* **Private**	
+* **Private**	  
 Local only.
 * **Restricted**  
 Require aunthentication and to have been explicitly granted access.
