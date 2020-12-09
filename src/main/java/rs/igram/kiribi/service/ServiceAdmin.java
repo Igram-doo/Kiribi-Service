@@ -30,6 +30,7 @@ import java.net.SocketAddress;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +74,7 @@ public final class ServiceAdmin {
 	private final Map<Address,InetSocketAddress> cache = new HashMap<>();
 	private final SessionServer server;
 	
-	final SocketAddress socketAddress;
+	final SocketAddress nattServerAddress;
 	final NetworkExecutor executor = new NetworkExecutor();
 	final EndpointProvider endpointProvider;
 	
@@ -94,19 +95,19 @@ public final class ServiceAdmin {
 	 *
 	 * @param pair The key pair which will be associated with this service admin.
 	 * @param serverPort The port to accept connections on.
-	 * @param socketAddress The socket address to accept connections on.
+	 * @param nattServerAddress The socket address of the NATT Server.
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
-	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress socketAddress) { 
+	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress nattServerAddress) { 
 		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
 		this.serverPort = serverPort;
-		this.socketAddress = socketAddress;
+		this.nattServerAddress = nattServerAddress;
 		this.address = new Address(pair.getPublic());
 		
 		System.out.println("Address: "+address);
 		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
 		
-		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);
+		endpointProvider = EndpointProvider.udpProvider(executor, address, nattServerAddress);
 		server = new SessionServer(serverPort, this, endpointProvider);
 		executor.onShutdown(1, this::shutdown);
 	}
@@ -170,7 +171,15 @@ public final class ServiceAdmin {
 	public ServiceAddress address(ServiceId id) {
 		return new ServiceAddress(id, address);
 	}
-
+	
+	/**
+	 * Returns the collection of active services.
+	 *
+	 * @return The collection of active services.
+	 */		
+	public Collection<Service> activeServices() {
+		return server().activeServices();
+	}
 	// -------------- Activation ----------------------------------------------
 	// initial batch activation
 	/**

@@ -26,6 +26,7 @@ package rs.igram.kiribi.service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +103,10 @@ final class SessionServer {
 	
 	public boolean isOpen() {
 		return endpoint != null && endpoint.isOpen();
+	}
+	
+	Collection<Service> activeServices() {
+		return serviceMap.values();
 	}
 	
 	private void activate() throws InterruptedException, IOException, TimeoutException {
