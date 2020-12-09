@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import rs.igram.kiribi.io.Encodable;
 import rs.igram.kiribi.io.VarInput; 
@@ -47,6 +48,7 @@ import rs.igram.kiribi.crypto.SignedData;
  * @author Michael Sargent
  */
 abstract class Authenticator {
+	static final Logger LOGGER = Logger.getLogger(Authenticator.class.getName());
 	static final SecureRandom random;
 
  	static {

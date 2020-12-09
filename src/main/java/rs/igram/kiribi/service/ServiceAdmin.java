@@ -42,6 +42,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.crypto.EC25519PrivateKey;
@@ -63,6 +64,7 @@ import static java.util.Collections.singleton;
  * @author Michael Sargent
  */
 public final class ServiceAdmin {
+	static final Logger LOGGER = Logger.getLogger(ServiceAdmin.class.getName());
 	private static final SecureRandom random;	
 	
 	private final EC25519PrivateKey privateKey;

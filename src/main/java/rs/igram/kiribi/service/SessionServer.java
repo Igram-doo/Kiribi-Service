@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import rs.igram.kiribi.net.Endpoint;
 import rs.igram.kiribi.net.EndpointProvider;
@@ -49,6 +50,7 @@ import rs.igram.kiribi.net.ServerEndpoint;
  */
 // manage incoming connections
 final class SessionServer {
+	static final Logger LOGGER = Logger.getLogger(SessionServer.class.getName());
 	private final EndpointProvider endpointProvider;
 		
 	private final Map<Endpoint,Transponder> endpoints = Collections.synchronizedMap(new HashMap<>());

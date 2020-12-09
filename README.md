@@ -136,6 +136,7 @@ Service
 ### Module Dependencies
 ##### Requires
 * java.base
+* java.logging
 * rs.igram.kiribi.io
 * rs.igram.kiribi.crypto
 * rs.igram.kiribi.net

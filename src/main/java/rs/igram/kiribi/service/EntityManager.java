@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import rs.igram.kiribi.service.util.ConsumerSupport;
 import rs.igram.kiribi.net.Address;
@@ -56,6 +57,7 @@ import rs.igram.kiribi.service.Session;
  * @author Michael Sargent
  */
 public final class EntityManager {
+	static final Logger LOGGER = Logger.getLogger(EntityManager.class.getName());
 	private	static final byte CLIENT_REQUEST_DATA_EXCHANGE = 100;
 	private static final byte SERVICE_RESPONSE_DATA_EXCHANGE = 100;
 	

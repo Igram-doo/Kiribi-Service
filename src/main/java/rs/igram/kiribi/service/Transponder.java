@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import rs.igram.kiribi.net.Address;
 import rs.igram.kiribi.net.ConnectionState;
@@ -47,6 +48,7 @@ import static rs.igram.kiribi.service.Message.*;
  * @author Michael Sargent
  */
 final class Transponder implements Consumer<ConnectionState> {
+	static final Logger LOGGER = Logger.getLogger(Transponder.class.getName());
 	private static final byte REQUEST = 0;
 	private static final byte RESPONSE = 1;
 	private Set<Transponder> transponders;

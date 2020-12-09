@@ -41,6 +41,7 @@
  */
 module rs.igram.kiribi.service {
 	requires java.base;
+	requires java.logging;
 	requires transitive rs.igram.kiribi.crypto;
 	requires transitive rs.igram.kiribi.io;
 	requires transitive rs.igram.kiribi.net;
