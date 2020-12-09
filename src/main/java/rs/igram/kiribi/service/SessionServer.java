@@ -43,6 +43,8 @@ import rs.igram.kiribi.net.NetworkMonitor;
 import rs.igram.kiribi.net.Endpoint;
 import rs.igram.kiribi.net.ServerEndpoint;
 
+import static java.util.logging.Level.*;
+
 /**
  * Manages sessions.
  *
@@ -79,7 +81,7 @@ final class SessionServer {
 					activate();
 				}catch(Exception e){
 					// todo
-					e.printStackTrace();
+					LOGGER.log(SEVERE, e.toString(), e);
 				}	
 			});
 		}
@@ -94,7 +96,7 @@ final class SessionServer {
 			activate();
 		}catch(Exception e){
 			// todo
-			e.printStackTrace();
+			LOGGER.log(SEVERE, e.toString(), e);
 		}
 	}
 	
@@ -115,7 +117,7 @@ final class SessionServer {
 		}finally{
 			starting = false;
 		}
-		System.out.println("Session server started on port " + port);
+		LOGGER.log(INFO, "Session server started on port {0} with Address {1}", new Object[]{port, admin.address});
 	}
 	
 	public void shutdown() {
@@ -134,17 +136,15 @@ final class SessionServer {
 		started = false;
 		endpoint = null;
 		endpointProvider.shutdown();
-		System.out.println("Server stopped");
+		LOGGER.log(INFO, "Shut down SessionServer with Address {0}", admin.address);
 	}
 	
 	private void listen() throws IOException {
 		endpoint.accept(e -> {
 			try{
-				System.out.println("SessionServer.listen: "+e);
+				LOGGER.log(FINEST, "SessionServer.listen:  {0}", e);
 				accept(e);
 			}catch(Exception ex){
-				// for testing
-				ex.printStackTrace();
 				try{
 					e.close();
 				}catch(IOException ex2){
@@ -175,7 +175,7 @@ final class SessionServer {
 				activate();
 			}catch(Exception e){
 				// todo
-				e.printStackTrace();
+				LOGGER.log(SEVERE, e.toString(), e);
 			}
 		}
 	}

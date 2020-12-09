@@ -57,7 +57,7 @@ import rs.igram.kiribi.service.util.retry.RetryTask;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-
+import static java.util.logging.Level.*;
 /**
  * Provides methods for service administration.
  *
@@ -65,10 +65,10 @@ import static java.util.Collections.singleton;
  */
 public final class ServiceAdmin {
 	static final Logger LOGGER = Logger.getLogger(ServiceAdmin.class.getName());
-	private static final SecureRandom random;	
+	static final SecureRandom random;	
 	
+	final Address address;	
 	private final EC25519PrivateKey privateKey;
-	private final Address address;
 	private final int serverPort;	
 	private final Map<Address,InetSocketAddress> cache = new HashMap<>();
 	private final SessionServer server;
@@ -81,8 +81,9 @@ public final class ServiceAdmin {
 	
 	static {
 		try{
-			random = SecureRandom.getInstance("SHA1PRNG", "SUN"); 
+			random = SecureRandom.getInstance("SHA1PRNG"); 
 		}catch(Exception e){
+			LOGGER.log(SEVERE, e.toString(), e);
 			throw new RuntimeException("Could not initialize secure random",e);
 		}
 	}
@@ -103,6 +104,8 @@ public final class ServiceAdmin {
 		this.address = new Address(pair.getPublic());
 		
 		System.out.println("Address: "+address);
+		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
+		
 		endpointProvider = EndpointProvider.udpProvider(executor, address, socketAddress);
 		server = new SessionServer(serverPort, this, endpointProvider);
 		executor.onShutdown(1, this::shutdown);
@@ -177,7 +180,7 @@ public final class ServiceAdmin {
 	 */	
 	public void activate(Service service) {
 		server().put(service);
-		System.out.println("ServiceAdmin activated: "+service.getDescriptor());
+		LOGGER.log(FINE, "ServiceAdmin activated: {0}", service.getDescriptor());
 	}
 	
 	/**
@@ -187,7 +190,7 @@ public final class ServiceAdmin {
 	 */	
 	public void deactivate(ServiceId id) {
 		server().remove(id);
-		System.out.println("ServiceAdmin deactivated: "+id);
+		LOGGER.log(FINE, "ServiceAdmin deactivated: {0}", id);
 	}
 
 	// -------------- network connection  --------------------------------------
@@ -212,6 +215,8 @@ public final class ServiceAdmin {
 			RetryTask.shutdown();
 			if(server != null) server.shutdown();
 			endpointProvider.shutdown();
+			
+			LOGGER.log(INFO, "Shutdown ServiceAdmin with Address {0}", address);
 			System.out.println("ServiceAdmin: shutdown");
 		}
 	}	

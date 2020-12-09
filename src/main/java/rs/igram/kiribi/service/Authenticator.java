@@ -26,12 +26,10 @@ package rs.igram.kiribi.service;
 
 import java.io.IOException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import rs.igram.kiribi.io.Encodable;
 import rs.igram.kiribi.io.VarInput; 
@@ -48,17 +46,6 @@ import rs.igram.kiribi.crypto.SignedData;
  * @author Michael Sargent
  */
 abstract class Authenticator {
-	static final Logger LOGGER = Logger.getLogger(Authenticator.class.getName());
-	static final SecureRandom random;
-
- 	static {
-		try{
-			random = SecureRandom.getInstance("SHA1PRNG", "SUN"); 
-		}catch(Exception e){
-			throw new RuntimeException("Could not initialize secure random",e);
-		}
-	}
-	
 	Entity entity;
 	
 	private Authenticator() {}
@@ -183,7 +170,7 @@ abstract class Authenticator {
 		private final byte[] b = new byte[SIZE];
 	
 		Challenge() {
-			random.nextBytes(b);
+			ServiceAdmin.random.nextBytes(b);
 		}
 	
 		Challenge(byte[] bytes) {
