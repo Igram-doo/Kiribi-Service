@@ -46,6 +46,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import rs.igram.kiribi.io.*;
+import rs.igram.kiribi.net.NetworkMonitor;
 
 /**
  * 
@@ -53,13 +54,13 @@ import rs.igram.kiribi.io.*;
  * @author Michael Sargent
  */
 public class ServiceAdminTest extends ServiceTest {
-/*
+
    @Test
    public void testActivate() throws IOException, InterruptedException, Exception {
    	   // todo
-   	   assertTrue(true);
+   	   assertTrue(NetworkMonitor.defaultNetworkInterface().isUp());
    }
-   */
+   
 /*
    @Test
    public void testPublicConnect() throws IOException, InterruptedException, Exception {
@@ -78,6 +79,7 @@ public class ServiceAdminTest extends ServiceTest {
    	   shutdown();
    }
 */
+
    @Test
    public void testRestrictedConnect() throws IOException, InterruptedException, Exception {
    	   setup();

@@ -26,6 +26,7 @@ package rs.igram.kiribi.service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ final class SessionServer {
 	private final Map<ServiceId, Service> serviceMap = Collections.synchronizedMap(new HashMap<>());
 	
 	private NetworkExecutor executor;
+	private NetworkMonitor monitor;
 	private ServiceAdmin admin;
 	
 	final Set<Transponder> transponders = Collections.synchronizedSet(new HashSet<>());
@@ -75,16 +77,24 @@ final class SessionServer {
 		this.endpointProvider = endpointProvider;
 		
 		executor = admin.executor;
-		
-		if(autoStart){
-			NetworkMonitor.onAvailable(() -> {	
+		try{
+		monitor = new NetworkMonitor(executor, (isUp, e) -> {
+			executor.submit(() -> {
+			if (e != null ) {
+				LOGGER.log(SEVERE, e.toString(), e);
+			} else if (isUp) {
 				try{
 					activate();
-				}catch(Exception e){
+				}catch(Exception ex){
 					// todo
-					LOGGER.log(SEVERE, e.toString(), e);
+					LOGGER.log(SEVERE, ex.toString(), ex);
 				}	
-			});
+			}
+		});
+		});
+		}catch(Exception ex){
+			// todo
+			LOGGER.log(SEVERE, ex.toString(), ex);
 		}
 	}
 	
@@ -110,15 +120,17 @@ final class SessionServer {
 	}
 	
 	private void activate() throws InterruptedException, IOException, TimeoutException {
-		if(!NetworkMonitor.isUp()) return;
 		if(endpoint != null && endpoint.isOpen()) return;
 //		if(sessionFactories.isEmpty()) return;
 		if(starting || started) return;
 		starting = true;
 		try{
+			if (!NetworkMonitor.defaultNetworkInterface().isUp()) return;
 			endpoint = endpointProvider.open(port);
 			listen();
 			started = true;
+		} catch(SocketException e) {
+			throw new IOException(e);
 		}finally{
 			starting = false;
 		}
@@ -128,6 +140,7 @@ final class SessionServer {
 	public void shutdown() {
 		try{
 			deactivate();
+			monitor.terminate();
 		}catch(IOException e){
 			// ignore
 		}

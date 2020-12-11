@@ -31,7 +31,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.KeyPair;
-//import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,7 @@ class ServiceTest {
 	static final InetAddress LOCAL_HOST;
 	static {
 		try {
-			LOCAL_HOST = InetAddress.getByName("127.0.0.1");
+			LOCAL_HOST = NetworkMonitor.inet();
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -106,7 +105,6 @@ class ServiceTest {
 	void setup() throws Exception {
 		System.out.println("INET: " + LOCAL_HOST);
 		executor = new NetworkExecutor();
-		NetworkMonitor.monitor(executor);
 		server = new NATTServer();
 		server.start(LOCAL_HOST, NATTServer.SERVER_PORT);
 		admin1 = new ServiceAdmin(PAIR1, PORT1, SA1);
