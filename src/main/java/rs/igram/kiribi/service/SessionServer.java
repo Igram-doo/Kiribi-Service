@@ -79,19 +79,19 @@ final class SessionServer {
 		this.endpointProvider = endpointProvider;
 		
 		executor = admin.executor;
-		monitor = new NetworkMonitor(executor, this::processNetworkStatusChange, admin.networkInterface, 50, 5000);
+		monitor = new NetworkMonitor(executor, this::processNetworkStatusChange, admin.networkInterface);
 	}
 	
 	private void processNetworkStatusChange(NetworkMonitor.Status status) {
 		executor.submit(() -> {
 			try{
-			switch(status){
-			case UP:
-				activate();
-				break;
-			default:
-				break;
-			}
+				switch(status){
+				case UP:
+					activate();
+					break;
+				default:
+					break;
+				}
 			} catch(InterruptedException e) {
 				// ignore
 			} catch(IOException e) {

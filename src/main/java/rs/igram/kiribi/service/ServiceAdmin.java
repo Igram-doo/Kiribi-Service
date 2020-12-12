@@ -101,24 +101,10 @@ public final class ServiceAdmin {
 	 * @param serverPort The port to accept connections on.
 	 * @param nattServerAddress The socket address of the NATT Server.
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
+	 * @throws SocketException if there was a problem determining the default network interface
 	 */
-	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress nattServerAddress) { 
-		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
-		this.serverPort = serverPort;
-		this.nattServerAddress = nattServerAddress;
-		this.address = new Address(pair.getPublic());
-		
-		System.out.println("Address: "+address);
-		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
-		
-		try {
-			this.networkInterface = NetworkMonitor.defaultNetworkInterface();
-		} catch(SocketException e) {
-			throw new RuntimeException(e);
-		}
-		endpointProvider = EndpointProvider.udpProvider(executor, address, nattServerAddress);
-		server = new SessionServer(serverPort, this, endpointProvider);
-		executor.onShutdown(1, this::shutdown);
+	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress nattServerAddress) throws SocketException { 
+		this(NetworkMonitor.defaultNetworkInterface(), pair, serverPort, nattServerAddress);
 	}
 
 	/**
