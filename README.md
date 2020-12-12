@@ -7,6 +7,7 @@ Provides classes and interfaces for building a secure service based peer-to-peer
 ### Features
 * Each peer only requires a single open upd port on the host device. NAT transversal and peer-to-peer network communication is provided by the [Kiribi-Net](http://github.com/Igram-doo/Kiribi-Net) module.
 * Encryption and authentication between peers is provided by the [Kiribi-Crypto](http://github.com/Igram-doo/Kiribi-Crypto) module.
+* Support for multi-homed devices.
 
 ### Overview
 Provides classes and interfaces for building a secure service based peer-to-peer network.
