@@ -47,6 +47,8 @@ import rs.igram.kiribi.net.ServerEndpoint;
 
 import static java.util.logging.Level.*;
 
+import static rs.igram.kiribi.net.NetworkMonitor.Status.*;
+
 /**
  * Manages sessions.
  *
@@ -77,25 +79,29 @@ final class SessionServer {
 		this.endpointProvider = endpointProvider;
 		
 		executor = admin.executor;
-		try{
-		monitor = new NetworkMonitor(executor, (isUp, e) -> {
-			executor.submit(() -> {
-			if (e != null ) {
+		monitor = new NetworkMonitor(executor, this::processNetworkStatusChange, admin.networkInterface, 50, 5000);
+	}
+	
+	private void processNetworkStatusChange(NetworkMonitor.Status status) {
+		executor.submit(() -> {
+			try{
+			switch(status){
+			case UP:
+				activate();
+				break;
+			default:
+				break;
+			}
+			} catch(InterruptedException e) {
+				// ignore
+			} catch(IOException e) {
+				// todo
 				LOGGER.log(SEVERE, e.toString(), e);
-			} else if (isUp) {
-				try{
-					activate();
-				}catch(Exception ex){
-					// todo
-					LOGGER.log(SEVERE, ex.toString(), ex);
-				}	
+			} catch(TimeoutException e) {
+				// todo
+				LOGGER.log(SEVERE, e.toString(), e);
 			}
 		});
-		});
-		}catch(Exception ex){
-			// todo
-			LOGGER.log(SEVERE, ex.toString(), ex);
-		}
 	}
 	
 	public int getPort() {return port;}
@@ -125,7 +131,7 @@ final class SessionServer {
 		if(starting || started) return;
 		starting = true;
 		try{
-			if (!NetworkMonitor.defaultNetworkInterface().isUp()) return;
+			if (monitor.status.get() != UP) return;
 			endpoint = endpointProvider.open(port);
 			listen();
 			started = true;

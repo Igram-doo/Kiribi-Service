@@ -69,7 +69,7 @@ public class EntityManagerTest extends ServiceTest {
    	   assertTrue(true);
    }
    */
-   /*
+   
    @Test
    public void testExchange() throws IOException, InterruptedException, Exception {
    	   setup();
@@ -80,5 +80,5 @@ public class EntityManagerTest extends ServiceTest {
    	   
    	   shutdown();
    }
-   */
+   
 }

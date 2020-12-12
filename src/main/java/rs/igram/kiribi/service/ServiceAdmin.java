@@ -26,7 +26,9 @@ package rs.igram.kiribi.service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ import rs.igram.kiribi.net.ConnectionAddress;
 import rs.igram.kiribi.net.Endpoint;
 import rs.igram.kiribi.net.EndpointProvider;
 import rs.igram.kiribi.net.NetworkExecutor;
+import rs.igram.kiribi.net.NetworkMonitor;
 import rs.igram.kiribi.service.util.retry.RetryListener;
 import rs.igram.kiribi.service.util.retry.RetryTask;
 
@@ -76,6 +79,7 @@ public final class ServiceAdmin {
 	
 	final SocketAddress nattServerAddress;
 	final NetworkExecutor executor = new NetworkExecutor();
+	final NetworkInterface networkInterface;
 	final EndpointProvider endpointProvider;
 	
 	private EntityManager mgr;
@@ -99,6 +103,35 @@ public final class ServiceAdmin {
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
 	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress nattServerAddress) { 
+		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
+		this.serverPort = serverPort;
+		this.nattServerAddress = nattServerAddress;
+		this.address = new Address(pair.getPublic());
+		
+		System.out.println("Address: "+address);
+		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
+		
+		try {
+			this.networkInterface = NetworkMonitor.defaultNetworkInterface();
+		} catch(SocketException e) {
+			throw new RuntimeException(e);
+		}
+		endpointProvider = EndpointProvider.udpProvider(executor, address, nattServerAddress);
+		server = new SessionServer(serverPort, this, endpointProvider);
+		executor.onShutdown(1, this::shutdown);
+	}
+
+	/**
+	 * Initializes a newly created <code>ServiceAdmin</code> object
+	 * with the given arguents.
+	 *
+	 * @param pair The key pair which will be associated with this service admin.
+	 * @param serverPort The port to accept connections on.
+	 * @param nattServerAddress The socket address of the NATT Server.
+	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
+	 */
+	public ServiceAdmin(NetworkInterface networkInterface, KeyPair pair, int serverPort, SocketAddress nattServerAddress) { 
+		this.networkInterface = networkInterface;
 		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
 		this.serverPort = serverPort;
 		this.nattServerAddress = nattServerAddress;
