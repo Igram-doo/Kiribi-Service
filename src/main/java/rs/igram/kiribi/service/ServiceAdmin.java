@@ -111,6 +111,7 @@ public final class ServiceAdmin {
 	 * Initializes a newly created <code>ServiceAdmin</code> object
 	 * with the given arguents.
 	 *
+	 * @param networkInterface The <code>NetworkInterface</code> which will be associated with this service admin.
 	 * @param pair The key pair which will be associated with this service admin.
 	 * @param serverPort The port to accept connections on.
 	 * @param nattServerAddress The socket address of the NATT Server.
