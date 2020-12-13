@@ -170,7 +170,6 @@ public class Session {
 			Transponder transponder = new Transponder(admin.executor, admin.server().transponders);
 			transponder.connectProxy(endpoint, this);
 		}catch(Exception e){
-			e.printStackTrace();
 			throw new ServiceException(e);
 		}
 	}
