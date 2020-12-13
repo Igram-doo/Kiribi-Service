@@ -25,6 +25,7 @@
 package rs.igram.kiribi.service;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -40,6 +41,8 @@ public class ServiceException extends Exception {
 		EXECUTION,
 		/** Indicates the task was interrupted. */	
 		INTERRUPTED,
+		/** Indicates the remote address was not registered. */	
+		UNREGISTERED,
 		/** Indicates an IO problem. */	
 		IO,
 		/** Indicates the task timed out. */	
@@ -62,6 +65,9 @@ public class ServiceException extends Exception {
 			initCause(t);
 		}else if(t instanceof InterruptedException){
 			type = Type.INTERRUPTED;
+			initCause(t);
+		}else if(t instanceof NoRouteToHostException){
+			type = Type.UNREGISTERED;
 			initCause(t);
 		}else if(t instanceof IOException){
 			type = Type.IO;

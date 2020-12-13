@@ -103,7 +103,7 @@ class ServiceTest {
 	Entity alice;
 	
 	void setup() throws Exception {
-		System.out.println("INET: " + LOCAL_HOST);
+		//System.out.println("INET: " + LOCAL_HOST);
 		executor = new NetworkExecutor();
 		server = new NATTServer();
 		server.start(LOCAL_HOST, NATTServer.SERVER_PORT);
@@ -161,7 +161,7 @@ class ServiceTest {
 			long a = request.in().readLong();
 			long b = request.in().readLong();
 			long result = a + b;
-			System.out.println("PROCESSED REQUEST: " + result);
+			//System.out.println("PROCESSED REQUEST: " + result);
 			Message response = request.respond(CODE);
 			response.out().writeLong(result);
 		
