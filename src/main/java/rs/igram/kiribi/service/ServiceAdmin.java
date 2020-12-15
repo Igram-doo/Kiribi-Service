@@ -124,11 +124,12 @@ public final class ServiceAdmin {
 		this.nattServerAddress = nattServerAddress;
 		this.address = new Address(pair.getPublic());
 		
-		System.out.println("Address: "+address);
+		InetSocketAddress socketAddress = new InetSocketAddress(NetworkMonitor.inet(networkInterface), serverPort);
+		System.out.println("Address: "+address + " " + socketAddress);
 		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
 		
-		endpointProvider = EndpointProvider.udpProvider(executor, address, nattServerAddress);
-		server = new SessionServer(serverPort, this, endpointProvider);
+		endpointProvider = EndpointProvider.udpProvider(executor, socketAddress, address, nattServerAddress);
+		server = new SessionServer(this, endpointProvider);
 		executor.onShutdown(1, this::shutdown);
 	}
 

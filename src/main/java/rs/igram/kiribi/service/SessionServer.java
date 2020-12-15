@@ -69,12 +69,10 @@ final class SessionServer {
 	final Set<Transponder> transponders = Collections.synchronizedSet(new HashSet<>());
 	
 	protected ServerEndpoint endpoint;
-	protected int port;
 	protected boolean autoStart = true;
 	protected boolean starting, started;
 
-	public SessionServer(int port, ServiceAdmin admin, EndpointProvider endpointProvider) {
-		this.port = port;
+	public SessionServer(ServiceAdmin admin, EndpointProvider endpointProvider) {
 		this.admin = admin;
 		this.endpointProvider = endpointProvider;
 		
@@ -104,19 +102,6 @@ final class SessionServer {
 		});
 	}
 	
-	public int getPort() {return port;}
-	
-	public void setPort(int value) {
-		port = value;
-		try{
-			deactivate();
-			activate();
-		}catch(Exception e){
-			// todo
-			LOGGER.log(SEVERE, e.toString(), e);
-		}
-	}
-	
 	public boolean isOpen() {
 		return endpoint != null && endpoint.isOpen();
 	}
@@ -132,7 +117,7 @@ final class SessionServer {
 		starting = true;
 		try{
 			if (monitor.status.get() != UP) return;
-			endpoint = endpointProvider.open(port);
+			endpoint = endpointProvider.server();
 			listen();
 			started = true;
 		} catch(SocketException e) {
@@ -140,7 +125,7 @@ final class SessionServer {
 		}finally{
 			starting = false;
 		}
-		LOGGER.log(INFO, "Session server started on port {0} with Address {1}", new Object[]{port, admin.address});
+		LOGGER.log(INFO, "Session server started with Address {1}", admin.address);
 	}
 	
 	public void shutdown() {
