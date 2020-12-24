@@ -103,10 +103,9 @@ class ServiceTest {
 	Entity alice;
 	
 	void setup() throws Exception {
-		//System.out.println("INET: " + LOCAL_HOST);
 		executor = new NetworkExecutor();
 		server = new NATTServer();
-		server.start(LOCAL_HOST, NATTServer.SERVER_PORT);
+		server.start(new InetSocketAddress(LOCAL_HOST, NATTServer.SERVER_PORT));
 		admin1 = new ServiceAdmin(PAIR1, PORT1, SA1);
 		admin2 = new ServiceAdmin(PAIR2, PORT2, SA2);
 		
@@ -143,8 +142,8 @@ class ServiceTest {
 		latch.await();
 	}
 	
-	static rs.igram.kiribi.net.Address address(KeyPair pair) {
-		return new rs.igram.kiribi.net.Address(pair.getPublic());
+	static Address address(KeyPair pair) {
+		return new Address(pair.getPublic());
 	}
 	
 	static class TestServiceSession extends Session {
