@@ -125,7 +125,7 @@ final class SessionServer {
 		}finally{
 			starting = false;
 		}
-		LOGGER.log(INFO, "Session server started with Address {1}", admin.address);
+		LOGGER.log(INFO, "Session server started with Address {0}", admin.address);
 	}
 	
 	public void shutdown() {

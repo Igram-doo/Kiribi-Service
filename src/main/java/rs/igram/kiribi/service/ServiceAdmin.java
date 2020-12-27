@@ -77,7 +77,6 @@ public final class ServiceAdmin {
 	private final Map<Address,InetSocketAddress> cache = new HashMap<>();
 	private final SessionServer server;
 	
-	final SocketAddress nattServerAddress;
 	final NetworkExecutor executor = new NetworkExecutor();
 	final NetworkInterface networkInterface;
 	final EndpointProvider endpointProvider;
@@ -103,6 +102,7 @@ public final class ServiceAdmin {
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 * @throws SocketException if there was a problem determining the default network interface
 	 */
+	@Deprecated
 	public ServiceAdmin(KeyPair pair, int serverPort, SocketAddress nattServerAddress) throws SocketException { 
 		this(NetworkMonitor.defaultNetworkInterface(), pair, serverPort, nattServerAddress);
 	}
@@ -117,18 +117,57 @@ public final class ServiceAdmin {
 	 * @param nattServerAddress The socket address of the NATT Server.
 	 * @throws ClassCastException if the provided key is not an instance of rs.igram.kiribi.crypto.Key.Private
 	 */
+	@Deprecated
 	public ServiceAdmin(NetworkInterface networkInterface, KeyPair pair, int serverPort, SocketAddress nattServerAddress) { 
+		
 		this.networkInterface = networkInterface;
 		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
 		this.serverPort = serverPort;
-		this.nattServerAddress = nattServerAddress;
 		this.address = new Address(pair.getPublic());
-		
+	
 		InetSocketAddress socketAddress = new InetSocketAddress(NetworkMonitor.inet(networkInterface), serverPort);
 		System.out.println("Address: "+address + " " + socketAddress);
 		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
 		
 		endpointProvider = EndpointProvider.udpProvider(executor, socketAddress, address, nattServerAddress);
+		server = new SessionServer(this, endpointProvider);
+		executor.onShutdown(1, this::shutdown);
+	}
+
+	/**
+	 * Initializes a newly created <code>ServiceAdmin</code> object
+	 * with the given arguents.
+	 *
+	 * @param pair The key pair which will be associated with this service admin.
+	 * @param serverPort The port to accept connections on.
+	 * @param endpointProvider The endpoint provider to use.
+	 * @throws ClassCastException if the provided key pair's private key is not an instance of rs.igram.kiribi.crypto.EC25519PrivateKey
+	 * @throws SocketException if there was a problem determining the default network interface
+	 */
+	public ServiceAdmin(KeyPair pair, int serverPort, EndpointProvider endpointProvider) throws SocketException { 
+		this(NetworkMonitor.defaultNetworkInterface(), pair, serverPort, endpointProvider);
+	}
+
+	/**
+	 * Initializes a newly created <code>ServiceAdmin</code> object
+	 * with the given arguents.
+	 *
+	 * @param networkInterface The <code>NetworkInterface</code> which will be associated with this service admin.
+	 * @param pair The key pair which will be associated with this service admin.
+	 * @param serverPort The port to accept connections on.
+	 * @param endpointProvider The endpoint provider to use.
+	 * @throws ClassCastException if the provided key pair's private key is not an instance of rs.igram.kiribi.crypto.EC25519PrivateKey
+	 */
+	public ServiceAdmin(NetworkInterface networkInterface, KeyPair pair, int serverPort, EndpointProvider endpointProvider) { 
+		
+		this.networkInterface = networkInterface;
+		this.privateKey = (EC25519PrivateKey)pair.getPrivate();
+		this.serverPort = serverPort;
+		this.endpointProvider = endpointProvider;
+		this.address = new Address(pair.getPublic());
+	
+		System.out.println("Address: "+address);
+		LOGGER.log(INFO, "Starting ServiceAdmin with Address {0}", address);
 		server = new SessionServer(this, endpointProvider);
 		executor.onShutdown(1, this::shutdown);
 	}

@@ -53,6 +53,7 @@ import org.junit.jupiter.api.io.TempDir;
 import rs.igram.kiribi.crypto.KeyPairGenerator;
 import rs.igram.kiribi.io.*;
 import rs.igram.kiribi.net.Address;
+import rs.igram.kiribi.net.EndpointProvider;
 import rs.igram.kiribi.net.NetworkExecutor;
 import rs.igram.kiribi.net.NetworkMonitor;
 import rs.igram.kiribi.net.natt.*;
@@ -71,18 +72,17 @@ class ServiceTest {
 	static final int PORT2 = 8701;
 	static final int PORT3 = 8702;
 	
-	static final InetAddress LOCAL_HOST;
+	static final InetAddress HOST;
 	static {
 		try {
-			LOCAL_HOST = NetworkMonitor.inet();
+			HOST = NetworkMonitor.inet();
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	SocketAddress SA1 = new InetSocketAddress(LOCAL_HOST, NATTServer.SERVER_PORT);
-	SocketAddress SA2 = new InetSocketAddress(LOCAL_HOST, NATTServer.SERVER_PORT);
-	SocketAddress SA3 = new InetSocketAddress(LOCAL_HOST, PORT3);
+	SocketAddress NATT_ADDRESS = new InetSocketAddress(HOST, NATTServer.SERVER_PORT);
+	SocketAddress SA3 = new InetSocketAddress(HOST, PORT3);
 	
 	static final ServiceId ID = ServiceId.parse(1l);
 	static final byte CODE = 0x01;
@@ -102,12 +102,21 @@ class ServiceTest {
 	Entity bob;
 	Entity alice;
 	
+	static ServiceAdmin admin(KeyPair pair, int port, InetSocketAddress serverAddress) throws Exception {
+		Address address = new Address(pair.getPublic());
+		InetSocketAddress socketAddress = new InetSocketAddress(NetworkMonitor.inet(), port);
+		EndpointProvider ep = EndpointProvider.udpProvider(new NetworkExecutor(), socketAddress, address, serverAddress);
+		return new ServiceAdmin(pair, port, ep);
+	}
+	
 	void setup() throws Exception {
 		executor = new NetworkExecutor();
 		server = new NATTServer();
-		server.start(new InetSocketAddress(LOCAL_HOST, NATTServer.SERVER_PORT));
-		admin1 = new ServiceAdmin(PAIR1, PORT1, SA1);
-		admin2 = new ServiceAdmin(PAIR2, PORT2, SA2);
+		InetSocketAddress nattServerAddress = new InetSocketAddress(HOST, NATTServer.SERVER_PORT);
+		server.start(nattServerAddress);
+		
+		admin1 = admin(PAIR1, PORT1, nattServerAddress);
+		admin2 = admin(PAIR2, PORT2, nattServerAddress);
 		
 		mgr1 = admin1.entityManager(new ArrayList<Entity>());
 		mgr2 = admin2.entityManager(new ArrayList<Entity>());
@@ -120,7 +129,7 @@ class ServiceTest {
 	}
 	
 	void configureEntities(Scope scope) throws Exception {
-		CountDownLatch latch = new CountDownLatch(2);
+		CountDownLatch latch = new CountDownLatch(1);
 		bob = new Entity(true, address(PAIR2).toString(), BOB);
 		alice = new Entity(true, address(PAIR1).toString(), ALICE);
 		

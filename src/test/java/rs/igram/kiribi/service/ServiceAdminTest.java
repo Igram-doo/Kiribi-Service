@@ -82,10 +82,9 @@ public class ServiceAdminTest extends ServiceTest {
 
    @Test
    public void testRestrictedConnect() throws IOException, InterruptedException, Exception {
+   
    	   setup();
-
    	   configureEntities(Scope.RESTRICTED);
-   	   
    	   ServiceAddress address = admin1.address(ID);
    	   TestClientSession client = new TestClientSession(Scope.RESTRICTED, address);
    	   
@@ -97,7 +96,6 @@ public class ServiceAdminTest extends ServiceTest {
    	   assertEquals(2, result);
    	   
    	   shutdown();
-   	   
    }
    
 /*
