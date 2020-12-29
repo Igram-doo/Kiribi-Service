@@ -65,94 +65,63 @@ import rs.igram.kiribi.service.util.*;
  * @author Michael Sargent
  */
 class ServiceTest {
-	static final KeyPair PAIR1 = KeyPairGenerator.generateKeyPair();
-	static final KeyPair PAIR2 = KeyPairGenerator.generateKeyPair();
-	
-	static final int PORT1 = 8700;
-	static final int PORT2 = 8701;
-	static final int PORT3 = 8702;
-	
-	static final InetAddress HOST;
-	static {
-		try {
-			HOST = NetworkMonitor.inet();
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	SocketAddress NATT_ADDRESS = new InetSocketAddress(HOST, NATTServer.SERVER_PORT);
-	SocketAddress SA3 = new InetSocketAddress(HOST, PORT3);
-	
 	static final ServiceId ID = ServiceId.parse(1l);
 	static final byte CODE = 0x01;
 	
 	static final String BOB = "Bob";
 	static final String ALICE = "Alice";
 	
-	NetworkExecutor executor;	
-	NATTServer server;
-   	   	
-	ServiceAdmin admin1;
-	ServiceAdmin admin2;
-	
-	EntityManager mgr1;
-	EntityManager mgr2;
-	
 	Entity bob;
 	Entity alice;
 	
-	static ServiceAdmin admin(KeyPair pair, int port, InetSocketAddress serverAddress) throws Exception {
-		Address address = new Address(pair.getPublic());
-		InetSocketAddress socketAddress = new InetSocketAddress(NetworkMonitor.inet(), port);
-		EndpointProvider ep = EndpointProvider.udp(new NetworkExecutor(), socketAddress, address, serverAddress);
-		return new ServiceAdmin(pair, port, ep);
-	}
+	Peer peer1;
+	Peer peer2;
 	
-	void setup() throws Exception {
-		executor = new NetworkExecutor();
+	NATTServer server;
+	
+	void setup(int offset, Peer.Type type, Scope scope) throws Exception {
+		int port = 4000;
+		
+		InetSocketAddress serverAddress = type == Peer.Type.LAN ?
+			EndpointProvider.defaultGroup():
+			new InetSocketAddress(NetworkMonitor.inet(), port + offset);
+			
 		server = new NATTServer();
-		InetSocketAddress nattServerAddress = new InetSocketAddress(HOST, NATTServer.SERVER_PORT);
-		server.start(nattServerAddress);
+		server.start(serverAddress);
 		
-		admin1 = admin(PAIR1, PORT1, nattServerAddress);
-		admin2 = admin(PAIR2, PORT2, nattServerAddress);
-		
-		mgr1 = admin1.entityManager(new ArrayList<Entity>());
-		mgr2 = admin2.entityManager(new ArrayList<Entity>());
+		peer1 = new Peer(port + offset + 1, serverAddress, type);
+		peer2 = new Peer(port + offset + 2, serverAddress, type);		
 	}
 	
 	void shutdown() throws Exception {
-		admin1.shutdown();
-		admin2.shutdown();
+		peer1.admin.shutdown();
+		peer2.admin.shutdown();
 		server.shutdown();
+		
+		Thread.sleep(500);
 	}
 	
 	void configureEntities(Scope scope) throws Exception {
 		CountDownLatch latch = new CountDownLatch(1);
-		bob = new Entity(true, address(PAIR2).toString(), BOB);
-		alice = new Entity(true, address(PAIR1).toString(), ALICE);
+		bob = new Entity(true, peer2.address.toString(), BOB);
+		alice = new Entity(true, peer1.address.toString(), ALICE);
 		
-		ServiceAddress address = admin1.address(ID); 
+		ServiceAddress address = peer1.admin.address(ID); 
 		TestService service = new TestService(address, scope);
-		admin1.activate(service);
+		peer1.admin.activate(service);
 		
 		Set<Descriptor> granted = Set.of(service.getDescriptor());
 		bob.setGranted(granted);
 		
-		mgr1.setOnExchange(e -> latch.countDown());
-		mgr1.add(bob);
+		peer1.mgr.setOnExchange(e -> latch.countDown());
+		peer1.mgr.add(bob);
 		Thread.sleep(3000);
 		
-		mgr2.setOnExchange(e -> latch.countDown());
-		mgr2.add(alice);
+		peer2.mgr.setOnExchange(e -> latch.countDown());
+		peer2.mgr.add(alice);
 		Thread.sleep(3000);
 		
 		latch.await();
-	}
-	
-	static Address address(KeyPair pair) {
-		return new Address(pair.getPublic());
 	}
 	
 	static class TestServiceSession extends Session {

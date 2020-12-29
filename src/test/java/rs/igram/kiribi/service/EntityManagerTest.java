@@ -72,11 +72,9 @@ public class EntityManagerTest extends ServiceTest {
    
    @Test
    public void testExchange() throws IOException, InterruptedException, Exception {
-   	   
-   	   setup();
+   	   setup(200, Peer.Type.UDP, Scope.PUBLIC);
    	   configureEntities(Scope.PUBLIC);
    	   assertTrue(alice.available(ID));
    	   shutdown();
    } 
-   
 }

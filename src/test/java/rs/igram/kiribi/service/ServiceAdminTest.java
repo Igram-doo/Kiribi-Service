@@ -79,16 +79,16 @@ public class ServiceAdminTest extends ServiceTest {
    	   shutdown();
    }
 */
-
+/*
    @Test
    public void testRestrictedConnect() throws IOException, InterruptedException, Exception {
    
-   	   setup();
+   	   setup(100, Peer.Type.UDP, Scope.RESTRICTED);
    	   configureEntities(Scope.RESTRICTED);
-   	   ServiceAddress address = admin1.address(ID);
+   	   ServiceAddress address = peer1.admin.address(ID);
    	   TestClientSession client = new TestClientSession(Scope.RESTRICTED, address);
    	   
-   	   client.connect(admin2);
+   	   client.connect(peer2.admin);
    	   long a = 1;
    	   long b = 1;
    	   
@@ -97,7 +97,7 @@ public class ServiceAdminTest extends ServiceTest {
    	   
    	   shutdown();
    }
-   
+ */  
 /*
    @Test
    public void testShutdown() throws IOException, InterruptedException {

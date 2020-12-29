@@ -52,6 +52,7 @@ public final class Descriptor implements Encodable {
 		
 	private Description description = new Description();
 	private String tags = "";
+	private String group = "";
 	// extensions for fututre releases
 	private byte[] ext = new byte[0];
 
@@ -60,11 +61,11 @@ public final class Descriptor implements Encodable {
 	 * with the given arguments.
 	 *
 	 * @param address The address of the service.
-	 * @param tags The tags of the service.
+	 * @param group The group of the service.
 	 * @param type The type of the service.
 	 */
-	public Descriptor(ServiceAddress address, String tags, int type) {
-		this(address, type, Scope.PUBLIC, tags, new Description());
+	public Descriptor(ServiceAddress address, String group, int type) {
+		this(address, type, Scope.PUBLIC, group, "", new Description());
 	}
 	
 	/**
@@ -74,16 +75,18 @@ public final class Descriptor implements Encodable {
 	 * @param address The address of the service.
 	 * @param type The type of the service.
 	 * @param scope The scope of the service.
+	 * @param group The group of the service.
 	 * @param tags The tags of the service.
 	 * @param description The description of the service.
 	 */
-	public Descriptor(ServiceAddress address, int type, Scope scope, String tags, Description description) {
+	public Descriptor(ServiceAddress address, int type, Scope scope, String group, String tags, Description description) {
 		version = VERSION_0;
 		this.address = address;
 		this.type = type;	
 		this.scope = scope;
 		this.description = description;
-		tags = tags;
+		this.group = group;
+		this.tags = tags;
 	}
 
 	/**
@@ -98,6 +101,7 @@ public final class Descriptor implements Encodable {
 		address = new ServiceAddress(in);
 		type = in.readInt();
 		scope = in.readEnum(Scope.class);
+		group = in.readUTF();
 		tags = in.readUTF();
 		description = new Description(in);
 		// extensions
@@ -121,6 +125,7 @@ public final class Descriptor implements Encodable {
 		address.write(out);
 		out.writeInt(type);
 		out.writeEnum(scope);
+		out.writeUTF(group);
 		out.writeUTF(tags);
 		out.write(description);
 		// extensions
@@ -175,6 +180,13 @@ public final class Descriptor implements Encodable {
 	}
 	
 	/**
+	 * Sets the group of the service.
+	 *
+	 * @param value The group of the service.
+	 */
+	public void setGroup(String value) {group = value;}
+	
+	/**
 	 * Sets the tags of the service.
 	 *
 	 * @param value The tags of the service.
@@ -187,6 +199,13 @@ public final class Descriptor implements Encodable {
 	 * @return The description of the service.
 	 */
 	public Description getDescription() {return description;}
+	
+	/**
+	 * Returns the group of the service.
+	 *
+	 * @return The group of the service.
+	 */
+	public String getGroup() {return group;}
 	
 	/**
 	 * Returns the tags of the service.
@@ -226,6 +245,7 @@ public final class Descriptor implements Encodable {
 			       && address.equals(d.address)
 			       && type == d.type
 			       && getScope() == d.getScope()
+			       && group.equals(d.group)
 			       && tags.equals(d.tags)
 			       && description.equals(d.description);
 		}
@@ -240,7 +260,7 @@ public final class Descriptor implements Encodable {
 	@Override
 	public String toString() {
 		return "Descriptor:["+Arrays.deepToString(
-		           new Object[]{version, address, type, getScope(), tags, description}
+		           new Object[]{version, address, type, getScope(), group, tags, description}
 		       )+"]";
 	}
 

@@ -50,7 +50,7 @@ public abstract class AbstractService implements Service, Encodable {
 	 * @param description The description of the new service.
 	 */	
 	protected AbstractService(ServiceAddress address, Scope scope, Descriptor.Description description) {
-		this(address, 0, scope, "", description);
+		this(address, 0, scope, "", "", description);
 	}
 
 	/**
@@ -59,11 +59,12 @@ public abstract class AbstractService implements Service, Encodable {
 	 * @param address The service address of the new service.
 	 * @param type The type of the new service.
 	 * @param scope The scope of the new service.
+	 * @param group The group of the new service.
 	 * @param tags The tags of the new service.
 	 * @param description The description of the new service.
 	 */	
-	protected AbstractService(ServiceAddress address, int type, Scope scope, String tags, Descriptor.Description description) {
-		descriptor = new Descriptor(address, type, scope, tags, description);
+	protected AbstractService(ServiceAddress address, int type, Scope scope, String group, String tags, Descriptor.Description description) {
+		descriptor = new Descriptor(address, type, scope, group, tags, description);
 	}
 
 	/**

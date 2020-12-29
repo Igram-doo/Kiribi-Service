@@ -340,7 +340,7 @@ public final class EntityManager {
 		ServiceAdmin admin;
 			
 		ExchangeService(ServiceAddress address) {
-			super(address, 1, Scope.RESTRICTED, "" , new Descriptor.Description());
+			super(address, 1, Scope.RESTRICTED, "", "", new Descriptor.Description());
 		}
 			
 		@Override
