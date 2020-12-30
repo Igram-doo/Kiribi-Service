@@ -145,6 +145,5 @@ Service
 ##### Exports
 * rs.igram.kiribi.service
 
-### To Do
-* Determine minimum supported Java version.
+Java version 11
 
