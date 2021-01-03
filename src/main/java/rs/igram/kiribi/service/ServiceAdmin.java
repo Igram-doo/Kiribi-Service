@@ -84,9 +84,9 @@ public final class ServiceAdmin {
 	private EntityManager mgr;
 	
 	static {
-		try{
+		try {
 			random = SecureRandom.getInstance("SHA1PRNG"); 
-		}catch(Exception e){
+		} catch(Exception e) {
 			LOGGER.log(SEVERE, e.toString(), e);
 			throw new RuntimeException("Could not initialize secure random",e);
 		}
@@ -226,9 +226,9 @@ public final class ServiceAdmin {
 	}
 	
 	Endpoint doConnect(ServiceAddress address) throws ServiceException {
-		try{
+		try {
 			return endpointProvider.open(new ConnectionAddress(address.host(), address.id().value()));
-		}catch(Exception e){
+		} catch(Exception e) {
 			throw new ServiceException(e);
 		}
 	}

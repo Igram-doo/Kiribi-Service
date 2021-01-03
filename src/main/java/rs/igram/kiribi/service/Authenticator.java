@@ -74,12 +74,12 @@ abstract class Authenticator {
 	}
 	
 	private static boolean authenticateServer(ServiceAddress address, boolean isProxy, EncodedStream stream, EntityManager mgr) throws IOException {
-		if(isProxy){
+		if(isProxy) {
 			Challenge challenge = new Challenge();
 			stream.write(challenge);
 			SignedData data = stream.read(SignedData::new);
 			return challenge.verify(data, address.host());
-		}else{
+		} else {
 			Challenge challenge = stream.read(Challenge::new);
 			stream.write(mgr.admin.signData(challenge.encode()));
 			return true;
@@ -102,9 +102,9 @@ abstract class Authenticator {
 		
 		@Override
 		public boolean authenticate(boolean isProxy, EncodedStream stream) {
-			try{
+			try {
 				return authenticateServer(address, isProxy, stream, mgr);
-			}catch(IOException e){
+			} catch(IOException e) {
 				return false;
 			}
 		}
@@ -121,33 +121,33 @@ abstract class Authenticator {
 		}
 		
 		private boolean authenticate(Address addr) {
-			try{
+			try {
 				Optional<Entity> optional = mgr.authenticate(addr, address.id());
-				if(optional.isPresent()){
+				if(optional.isPresent()) {
 					entity = optional.get();
 					return true;
 				}
 				return false;
-			}catch(IOException e){
+			} catch(IOException e) {
 				return false;
 			}
 		}
 		
 		@Override
 		public boolean authenticate(boolean isProxy, EncodedStream stream) {
-			try{
+			try {
 				if(!authenticateServer(address, isProxy, stream, mgr)) return false;
-				if(isProxy){
+				if(isProxy) {
 					// make sure the entity for the given address is in the entity manager
 					Optional<Entity> optional = mgr.entity(address.host());
-					if(optional.isPresent()){
+					if(optional.isPresent()) {
 						Challenge challenge = stream.read(Challenge::new);
 						stream.write(mgr.admin.signData(challenge.encode()));					
 						entity = optional.get();
 						return true;
 					}
 					return false;
-				}else{
+				} else {
 					Challenge challenge = new Challenge();
 					stream.write(challenge);					
 					SignedData data = stream.read(SignedData::new);
@@ -155,7 +155,7 @@ abstract class Authenticator {
 					if(!challenge.verify(data, addr)) return false;
 					return authenticate(addr);
 				}
-			}catch(IOException e){
+			} catch(IOException e) {
 				return false;
 			}
 		}
@@ -185,10 +185,10 @@ abstract class Authenticator {
 		public void write(VarOutput out) throws IOException {out.write(b);}
 	
 		boolean verify(SignedData data, Address address) {
-			try{
+			try {
 				Address addr = new Address(data.getPublicKey());
 				return data.verify(data.getPublicKey()) && address.equals(addr) && Arrays.equals(b, data.data());
-			}catch(IOException e){
+			} catch(IOException e) {
 				return false;
 			}
 		}

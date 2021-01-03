@@ -111,15 +111,15 @@ public class Session {
 	 */
 	protected <T> T request(long timeout, Request<T> request) throws ServiceException {
 		if(!isOpen() && isServiceSession) throw new IllegalStateException("Not a proxy session");
-		synchronized(this){
+		synchronized(this) {
 			if(!isOpen()) connect(admin);
 		}
 		
 		CompletableFuture<T> future = new CompletableFuture<>();
-		try{
+		try {
 			request.request(future);
 			return future.get(timeout, SECONDS);
-		}catch(Exception e){
+		} catch(Exception e) {
 			throw new ServiceException(e);
 		}
 	}
@@ -133,15 +133,15 @@ public class Session {
 	 */
 	protected void submit(long timeout, Submission submission) throws ServiceException {
 		if(!isOpen() && isServiceSession) throw new IllegalStateException("Not a proxy seesion");
-		synchronized(this){
+		synchronized(this) {
 			if(!isOpen()) connect(admin);
 		}
 		
 		CompletableFuture<Void> future = new CompletableFuture<>();
-		try{
+		try {
 			submission.submit(future);
 			future.get(timeout, SECONDS);
-		}catch(Exception e){
+		} catch(Exception e) {
 			throw new ServiceException(e);
 		}
 	}
@@ -165,11 +165,11 @@ public class Session {
 			authenticatorFactory = Authenticator.factory(scope, address, admin.entityManager(null));
 			configure();
 		}
-		try{
+		try {
 			Endpoint endpoint = admin.doConnect(address == null ? null : address.host(), id);
 			Transponder transponder = new Transponder(admin.executor, admin.server().transponders);
 			transponder.connectProxy(endpoint, this);
-		}catch(Exception e){
+		} catch(Exception e) {
 			throw new ServiceException(e);
 		}
 	}
@@ -177,7 +177,7 @@ public class Session {
 	// called by transponder
 	final void connected(Transponder value) {
 		transponder = value;
-		if(!configured){
+		if(!configured) {
 			configure();
 			configured = true;
 		}
@@ -281,7 +281,7 @@ public class Session {
 	@Override
 	public boolean equals(Object o){
 		if(this == o) return true;
-		if(o != null && getClass().equals(o.getClass())){
+		if(o != null && getClass().equals(o.getClass())) {
 			Session s = (Session)o;
 			return id.equals(s.id)
 			       && authenticatorFactory.equals(s.authenticatorFactory)
@@ -342,7 +342,7 @@ public class Session {
 		 * @param code The message code to process.
 		 * @param responseHandler The reponse handler used to process the response.
 		 */
-		public ResponseAdapter(Byte code, ResponseHandler responseHandler){
+		public ResponseAdapter(Byte code, ResponseHandler responseHandler) {
 			this(code, responseHandler, null);
 		}
 
@@ -354,26 +354,26 @@ public class Session {
 		 * @param responseHandler The reponse handler used to process the response.
 		 * @param errorHandler The reponse handler used to process the response error.
 		 */
-		public ResponseAdapter(Byte code, ResponseHandler responseHandler, ErrorHandler errorHandler){
+		public ResponseAdapter(Byte code, ResponseHandler responseHandler, ErrorHandler errorHandler) {
 			this.code = code;
 			this.responseHandler = responseHandler;
 			this.errorHandler = errorHandler;
 		}
 
 		@Override
-		public void response(Message response){
-			try{
+		public void response(Message response) {
+			try {
 				byte c = response.code();
 				byte s = response.status();
-				if(((code != null && c == code) || (code == null && s == OK))){
+				if(((code != null && c == code) || (code == null && s == OK))) {
 					if(responseHandler != null) responseHandler.apply(response);
-				}else if(s == ERROR && errorHandler != null){
+				} else if(s == ERROR && errorHandler != null) {
 					String msg = response.in().readUTF();
 					errorHandler.error("Remote Exception: "+msg);
-				}else if(errorHandler != null ){
+				} else if(errorHandler != null ) {
 					errorHandler.error("Unexpected Response: "+code+" "+response.code());
 				}
-			}catch(Throwable t){
+			} catch(Throwable t) {
 		//		t.printStackTrace();
 				if(errorHandler != null) errorHandler.error("Problem: "+t.getMessage());
 			}

@@ -132,7 +132,7 @@ public final class EntityManager {
 	 */	
 	public void exchange(Entity entity) {
 		admin.executor.submit(() -> {
-			try{
+			try {
 				ServiceAddress address = new ServiceAddress(ServiceId.ENTITY, entity.address());
 				ExchangeSession session = sessions.get(entity.address());
 				if(session == null) {
@@ -140,7 +140,7 @@ public final class EntityManager {
 					session.connect(admin);
 				}
 				session.exchange(entity, 15);
-			}catch(ServiceException e){
+			} catch(ServiceException e) {
 				switch(e.type) {
 				case INTERRUPTED :
 					// shutdown - ignore 
@@ -199,12 +199,12 @@ public final class EntityManager {
 			
 		// fetch entity associated with the address	
 		Optional<Entity> optional = entity(address);
-		if(optional.isPresent()){
+		if(optional.isPresent()) {
 			Entity entity = optional.get();
 			// check if the entity was granted access to the service
 			// note that it doesn't make sense to grant access to the EntityService,
 			// so if that is the service to be accessed just continue
-			if(ServiceId.ENTITY.equals(id) || entity.granted(id)){
+			if(ServiceId.ENTITY.equals(id) || entity.granted(id)) {
 				return Optional.of(entity);
 			}
 		}
@@ -235,9 +235,9 @@ public final class EntityManager {
 	
 		@Override
 		protected void onConnected() {
-			if(entity != null){
+			if(entity != null) {
 				assert(entity().equals(entity));
-			}else{
+			} else {
 				entity = entity();
 			}
 			sessions.put(entity().address(), this);
@@ -261,10 +261,10 @@ public final class EntityManager {
 		private void update(Entity entity, boolean notify) {
 			EntityManager.this.admin.executor.submit(() -> {
 				entity.setPending(false);
-				try{
+				try {
 					EntityManager.this.update(entity, false);
 					if(onExchange != null) onExchange.accept(notify ? entity : null);
-				}catch(IOException e){
+				} catch(IOException e) {
 					// todo
 					LOGGER.log(SEVERE, e.toString(), e);
 				}
@@ -287,19 +287,19 @@ public final class EntityManager {
 				new ResponseAdapter(
 					SERVICE_RESPONSE_DATA_EXCHANGE, 
 					response -> {
-						try{
+						try {
 							VarInput in = response.in();
-							if(in.readBoolean()){
+							if(in.readBoolean()) {
 								Entity.ExchangeData d = new Entity.ExchangeData(in);
 								entity.exchange(d);
 								update(entity, true);
-							}else{
+							} else {
 								update(entity, true);
 							}	
 
 							future.complete(null);
 							LOGGER.log(FINER, "EntityManager.proxy.exchange SUCCESS");
-						}catch(IOException e){
+						} catch(IOException e) {
 							future.completeExceptionally(e);
 						}
 					},
@@ -321,11 +321,11 @@ public final class EntityManager {
 			
 			Message response = request.respond(SERVICE_RESPONSE_DATA_EXCHANGE);
 			VarOutput out = response.out();
-			if(entity.isPending()){
+			if(entity.isPending()) {
 				out.writeBoolean(true);
 				Entity.ExchangeData data = entity.exchange();
 				out.write(data);
-			}else{
+			} else {
 				out.writeBoolean(false);
 			}
 			update(entity, true);

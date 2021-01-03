@@ -115,24 +115,24 @@ final class SessionServer {
 //		if(sessionFactories.isEmpty()) return;
 		if(starting || started) return;
 		starting = true;
-		try{
+		try {
 			if (monitor.status.get() != UP) return;
 			endpoint = endpointProvider.server();
 			listen();
 			started = true;
 		} catch(SocketException e) {
 			throw new IOException(e);
-		}finally{
+		} finally {
 			starting = false;
 		}
 		LOGGER.log(INFO, "Session server started with Address {0}", admin.address);
 	}
 	
 	public void shutdown() {
-		try{
+		try {
 			deactivate();
 			monitor.terminate();
-		}catch(IOException e){
+		} catch(IOException e) {
 			// ignore
 		}
 	}
@@ -150,13 +150,13 @@ final class SessionServer {
 	
 	private void listen() throws IOException {
 		endpoint.accept(e -> {
-			try{
+			try {
 				LOGGER.log(FINEST, "SessionServer.listen:  {0}", e);
 				accept(e);
-			}catch(Exception ex){
+			} catch(Exception ex) {
 				try{
 					e.close();
-				}catch(IOException ex2){
+				} catch(IOException ex2) {
 					// ignore
 				}	
 			}
@@ -165,7 +165,7 @@ final class SessionServer {
 
 	protected Transponder accept(Endpoint e) throws IOException {
 		Transponder t = endpoints.get(e);
-		if(t == null){
+		if(t == null) {
 			t = new Transponder(executor, transponders);
 			t.connectServer(e, serviceMap, admin);
 			endpoints.put(e,t);
@@ -180,9 +180,9 @@ final class SessionServer {
 		ServiceId id = service.id(); 
 		serviceMap.put(id, service);
 		if(autoStart){
-			try{
+			try {
 				activate();
-			}catch(Exception e){
+			} catch(Exception e) {
 				// todo
 				LOGGER.log(SEVERE, e.toString(), e);
 			}

@@ -228,7 +228,7 @@ public final class Descriptor implements Encodable {
 	
 	static Set<String> parseTags(String tags){
 		Set<String> result = new HashSet<>();
-		if(!tags.isEmpty()){
+		if(!tags.isEmpty()) {
 			String[] items = tags.toLowerCase().split("\\s");
 			int L = Math.min(5, items.length);
 			for(int i = 0; i < L; i++) result.add(items[i]);
@@ -239,7 +239,7 @@ public final class Descriptor implements Encodable {
 	@Override
 	public boolean equals(Object o){
 		if(this == o) return true;
-		if(o != null && o.getClass() == Descriptor.class){
+		if(o != null && o.getClass() == Descriptor.class) {
 			Descriptor d = (Descriptor)o;
 			return version == d.version
 			       && address.equals(d.address)
@@ -316,9 +316,9 @@ public final class Descriptor implements Encodable {
 			this.title = crop(title, 15);
 			this.description = crop(description, 140);
 
-			if(im == null){
+			if(im == null) {
 				image = new byte[0];
-			}else{
+			} else {
 				final int L = im.length;
 				image = new byte[L];
 				System.arraycopy(im, 0, image, 0, L);
@@ -384,7 +384,7 @@ public final class Descriptor implements Encodable {
 
 		@Override
 		public boolean equals(Object o){
-			if(o != null && o.getClass().equals(Description.class)){
+			if(o != null && o.getClass().equals(Description.class)) {
 				Description d = (Description)o;
 				return title.equals(d.title)
 				       && description.equals(d.description)

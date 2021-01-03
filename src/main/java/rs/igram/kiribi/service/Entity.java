@@ -323,9 +323,9 @@ public final class Entity implements Comparable<Entity>, Cloneable, Encodable {
 	 * @param address The service address to remove.
 	 */	
 	public void deleted(boolean isProxy, final ServiceAddress address){
-		if(isProxy){
+		if(isProxy) {
 			imported.delete(address);
-		}else{
+		} else {
 			exported.delete(address);
 		}
 	}
@@ -352,7 +352,7 @@ public final class Entity implements Comparable<Entity>, Cloneable, Encodable {
 	@Override
 	public boolean equals(Object o){
 		if(this == o) return true;
-		if(o != null && o.getClass() == Entity.class){
+		if(o != null && o.getClass() == Entity.class) {
 			final Entity e = (Entity)o;
 			return address.equals(e.address)
 				&& ((imported == null && e.imported == null) || imported.equals(e.imported))
@@ -365,9 +365,9 @@ public final class Entity implements Comparable<Entity>, Cloneable, Encodable {
 
 	@Override
 	public Entity clone() {
-		try{
+		try {
 			return new Entity(encode());
-		}catch(IOException e){
+		} catch(IOException e) {
 			throw new RuntimeException("Stream corrupted", e);
 		}
 	}

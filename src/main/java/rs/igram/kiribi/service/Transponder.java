@@ -125,7 +125,7 @@ final class Transponder implements Consumer<ConnectionState> {
 	// connection state
 	@Override
 	public void accept(ConnectionState state) {
-		switch(state){
+		switch(state) {
 		case CLOSED:
 			notify(new IOException("Endpoint closed"));
 			break;
@@ -149,9 +149,9 @@ final class Transponder implements Consumer<ConnectionState> {
 	Message respond(Message request) {
 		RequestHandler handler = session.handler(request.code());
 		if(handler == null) return request.error("Unknown request: "+request.code());
-		try{
+		try {
 			return handler.respond(request);
-		}catch(IOException e){
+		} catch(IOException e) {
 			return request.error("Remote error: "+e.getMessage());
 		}
 	}
@@ -179,8 +179,8 @@ final class Transponder implements Consumer<ConnectionState> {
 	}
 	
 	private void read() {
-		while(!Thread.currentThread().isInterrupted() && endpoint.isOpen()){
-			try{
+		while(!Thread.currentThread().isInterrupted() && endpoint.isOpen()) {
+			try {
 				Message msg = endpoint.read(Message::new);
 				byte type = msg.type();
 				boolean valid = type == REQUEST ? true : type == RESPONSE ? activeRequests.containsKey(msg.uid) : false;
@@ -193,7 +193,7 @@ final class Transponder implements Consumer<ConnectionState> {
 					processIncomingResponse(msg);
 					break;
 				}
-			}catch(IOException e){	
+			} catch(IOException e) {	
 				notify(e);
 				return;
 			}
@@ -217,9 +217,9 @@ final class Transponder implements Consumer<ConnectionState> {
 		// iterating over them
 		if(reader != null) reader.cancel(true);
 		if(endpoint != null && endpoint.isOpen()){
-			try{
+			try {
 				endpoint.close();
-			}catch(IOException e){
+			} catch(IOException e) {
 				// ignore
 			}
 		}
