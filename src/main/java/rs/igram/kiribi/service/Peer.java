@@ -48,6 +48,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import rs.igram.kiribi.crypto.KeyPairGenerator;
 import rs.igram.kiribi.io.*;
 import rs.igram.kiribi.net.Address;
+import rs.igram.kiribi.net.AddressMapper;
 import rs.igram.kiribi.net.EndpointProvider;
 import rs.igram.kiribi.net.NetworkExecutor;
 import rs.igram.kiribi.net.NetworkMonitor;
@@ -62,7 +63,7 @@ import rs.igram.kiribi.service.util.*;
 class Peer {
 	KeyPair pair;
 	Address address;
-	NetworkExecutor executor;
+	//NetworkExecutor executor;
 	ServiceAdmin admin;
 	InetSocketAddress serverAdress;
 	InetSocketAddress socketAddress;
@@ -75,18 +76,18 @@ class Peer {
 		try{
 			pair = KeyPairGenerator.generateKeyPair();
 			address = new Address(pair.getPublic());
-			executor = new NetworkExecutor();
+			//executor = new NetworkExecutor();
 			socketAddress = new InetSocketAddress(NetworkMonitor.inet(), port);
 			
 			switch(type){
 			case LAN:
-				provider = EndpointProvider.lan(executor, socketAddress, address, serverAddress);
+				provider = EndpointProvider.tcp(AddressMapper.discovery(address, socketAddress, serverAddress));
 				break;
 			case TCP:
-				provider = EndpointProvider.tcp(socketAddress, address, serverAddress);
+				provider = EndpointProvider.tcp(AddressMapper.lookup(address, socketAddress, serverAddress));
 				break;
 			case UDP:
-				provider = EndpointProvider.udp(executor, socketAddress, address, serverAddress);
+				provider = EndpointProvider.udp(socketAddress, address, serverAddress);
 				break;	
 			}
 			admin = new ServiceAdmin(pair, port, provider);
