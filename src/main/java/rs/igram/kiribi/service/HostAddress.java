@@ -106,7 +106,7 @@ public class HostAddress implements Encodable {
 	public boolean equals(Object o) {
 		if(this == o) return true;
 		if(o != null && o.getClass() == HostAddress.class){
-			HostAddress a = (HostAddress)o;
+			var a = (HostAddress)o;
 			return Arrays.equals(inet, a.inet) && port == a.port;
 		}
 		return false;

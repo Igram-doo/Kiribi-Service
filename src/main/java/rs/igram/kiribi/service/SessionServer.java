@@ -164,7 +164,7 @@ final class SessionServer {
 	}
 
 	protected Transponder accept(Endpoint e) throws IOException {
-		Transponder t = endpoints.get(e);
+		var t = endpoints.get(e);
 		if(t == null) {
 			t = new Transponder(executor, transponders);
 			t.connectServer(e, serviceMap, admin);
@@ -177,7 +177,7 @@ final class SessionServer {
 	// -------------------------------------------------------------------------
 	
 	public void put(Service service) {
-		ServiceId id = service.id(); 
+		var id = service.id(); 
 		serviceMap.put(id, service);
 		if(autoStart){
 			try {

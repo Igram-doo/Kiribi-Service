@@ -107,7 +107,7 @@ public class ServiceId implements Encodable {
 	public boolean equals(Object o) {
 		if(this == o) return true;
 		if(o != null && o.getClass() == ServiceId.class){
-			ServiceId a = (ServiceId)o;
+			var a = (ServiceId)o;
 			return data == a.data;
 		}
 		return false;

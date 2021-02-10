@@ -80,7 +80,7 @@ public final class EntityManager {
 		this.entities = entities;
 		this.admin = admin;
 		
-		ExchangeService service = new ExchangeService(admin.address(ServiceId.ENTITY));
+		var service = new ExchangeService(admin.address(ServiceId.ENTITY));
 		admin.activate(service);
 	}
 	
@@ -133,8 +133,8 @@ public final class EntityManager {
 	public void exchange(Entity entity) {
 		admin.executor.submit(() -> {
 			try {
-				ServiceAddress address = new ServiceAddress(ServiceId.ENTITY, entity.address());
-				ExchangeSession session = sessions.get(entity.address());
+				var address = new ServiceAddress(ServiceId.ENTITY, entity.address());
+				var session = sessions.get(entity.address());
 				if(session == null) {
 					session = session(null, entity);
 					session.connect(admin);
@@ -198,7 +198,7 @@ public final class EntityManager {
 		throws IOException {
 			
 		// fetch entity associated with the address	
-		Optional<Entity> optional = entity(address);
+		var optional = entity(address);
 		if(optional.isPresent()) {
 			Entity entity = optional.get();
 			// check if the entity was granted access to the service
@@ -278,7 +278,7 @@ public final class EntityManager {
 		
 		private void exchange(Entity entity, CompletableFuture<Void> future) throws IOException {
 			final Message request = Message.request(CLIENT_REQUEST_DATA_EXCHANGE);
-			VarOutput out = request.out();
+			var out = request.out();
 
 			Entity.ExchangeData data = entity.exchange();
 			out.write(data);
@@ -288,9 +288,9 @@ public final class EntityManager {
 					SERVICE_RESPONSE_DATA_EXCHANGE, 
 					response -> {
 						try {
-							VarInput in = response.in();
+							var in = response.in();
 							if(in.readBoolean()) {
-								Entity.ExchangeData d = new Entity.ExchangeData(in);
+								var d = new Entity.ExchangeData(in);
 								entity.exchange(d);
 								update(entity, true);
 							} else {
@@ -313,17 +313,17 @@ public final class EntityManager {
 		
 		// ---- responses ----
 		Message exchange(Message request) throws IOException {
-			Entity entity = entity();
-			VarInput in = request.in();
+			var entity = entity();
+			var in = request.in();
 
-			Entity.ExchangeData d = new Entity.ExchangeData(in);
+			var d = new Entity.ExchangeData(in);
 			entity.exchange(d);
 			
-			Message response = request.respond(SERVICE_RESPONSE_DATA_EXCHANGE);
-			VarOutput out = response.out();
+			var response = request.respond(SERVICE_RESPONSE_DATA_EXCHANGE);
+			var out = response.out();
 			if(entity.isPending()) {
 				out.writeBoolean(true);
-				Entity.ExchangeData data = entity.exchange();
+				var data = entity.exchange();
 				out.write(data);
 			} else {
 				out.writeBoolean(false);

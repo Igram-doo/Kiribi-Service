@@ -103,7 +103,7 @@ final class Transponder implements Consumer<ConnectionState> {
 		connect(endpoint, false);
 		ServiceId id = endpoint.read(ServiceId::new);
 		
-		Service service = serviceMap.get(id);
+		var service = serviceMap.get(id);
 		if(service == null) throw new IOException("Unknown service: "+id);
 		session = service.newSession();
 		if(session == null) throw new IOException("Unknown session: "+id);
@@ -147,7 +147,7 @@ final class Transponder implements Consumer<ConnectionState> {
 	}
 	
 	Message respond(Message request) {
-		RequestHandler handler = session.handler(request.code());
+		var handler = session.handler(request.code());
 		if(handler == null) return request.error("Unknown request: "+request.code());
 		try {
 			return handler.respond(request);
@@ -163,7 +163,7 @@ final class Transponder implements Consumer<ConnectionState> {
 	}
 
 	private void processIncomingResponse(Message response){
-		ResponseListener l = filter(response.code(), activeRequests.remove(response.uid));
+		var l = filter(response.code(), activeRequests.remove(response.uid));
 		if(l != null) {
 			executor.submit(() -> l.response(response));
 		}
@@ -181,9 +181,9 @@ final class Transponder implements Consumer<ConnectionState> {
 	private void read() {
 		while(!Thread.currentThread().isInterrupted() && endpoint.isOpen()) {
 			try {
-				Message msg = endpoint.read(Message::new);
-				byte type = msg.type();
-				boolean valid = type == REQUEST ? true : type == RESPONSE ? activeRequests.containsKey(msg.uid) : false;
+				var msg = endpoint.read(Message::new);
+				var type = msg.type();
+				var valid = type == REQUEST ? true : type == RESPONSE ? activeRequests.containsKey(msg.uid) : false;
 				if(!valid) continue;
 				switch(type){
 				case REQUEST:

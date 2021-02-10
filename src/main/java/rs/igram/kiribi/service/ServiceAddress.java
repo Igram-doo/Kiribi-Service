@@ -50,7 +50,7 @@ public class ServiceAddress implements Encodable {
 	 * @param value The string used to instantiate this service address.
 	 */	
 	public ServiceAddress(String value) {
-		String[] s = value.split(":");
+		var s = value.split(":");
 		id = ServiceId.parse(s[1]);
 		host = new Address(s[0]);
 	}
@@ -102,8 +102,8 @@ public class ServiceAddress implements Encodable {
 
 	@Override
 	public int hashCode() {
-		int p = 31;
-		int r = 1;
+		var p = 31;
+		var r = 1;
 		r = p * r + id.hashCode();
 		r = p * r + host.hashCode();
 		return r;
@@ -113,7 +113,7 @@ public class ServiceAddress implements Encodable {
 	public boolean equals(Object o) {
 		if(this == o) return true;
 		if(o != null && o.getClass() == ServiceAddress.class){
-			ServiceAddress a = (ServiceAddress)o;
+			var a = (ServiceAddress)o;
 			return id.equals(a.id) && host.equals(a.host);
 		}
 		return false;

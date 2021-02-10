@@ -73,7 +73,7 @@ public final class Message implements Encodable {
 		uid = in.readLong();
 		status = in.readByte();
 		code = in.readByte();
-		byte[] b = in.readBytes();
+		var b = in.readBytes();
 		this.in = new VarInputStream(b);
 	}
 
@@ -149,7 +149,7 @@ public final class Message implements Encodable {
 		out.writeLong(uid);
 		out.writeByte(status);
 		out.writeByte(code);
-		byte[] b = this.out.toByteArray();
+		var b = this.out.toByteArray();
 		out.writeBytes(b);
 		out = null;
 	}

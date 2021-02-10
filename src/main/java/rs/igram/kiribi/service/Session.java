@@ -166,8 +166,8 @@ public class Session {
 			configure();
 		}
 		try {
-			Endpoint endpoint = admin.doConnect(address == null ? null : address.host(), id);
-			Transponder transponder = new Transponder(admin.executor, admin.server().transponders);
+			var endpoint = admin.doConnect(address == null ? null : address.host(), id);
+			var transponder = new Transponder(admin.executor, admin.server().transponders);
 			transponder.connectProxy(endpoint, this);
 		} catch(Exception e) {
 			throw new ServiceException(e);
@@ -182,7 +182,7 @@ public class Session {
 			configured = true;
 		}
 		
-		NetworkExecutor executor = (admin == null) ?
+		var executor = (admin == null) ?
 			value.executor : 					// service session
 			admin.executor;						// client session
 		executor.submit(this::onConnected);
@@ -271,8 +271,8 @@ public class Session {
 		
 	@Override
 	public int hashCode() {
-		int p = 31;
-		int r = 1;
+		var p = 31;
+		var r = 1;
 		r = p * r + id.hashCode();
 		r = p * r + ((address == null) ? 0 : address.hashCode());
 		return r;
@@ -282,7 +282,7 @@ public class Session {
 	public boolean equals(Object o){
 		if(this == o) return true;
 		if(o != null && getClass().equals(o.getClass())) {
-			Session s = (Session)o;
+			var s = (Session)o;
 			return id.equals(s.id)
 			       && authenticatorFactory.equals(s.authenticatorFactory)
 			       && handlers.equals(s.handlers)
@@ -363,12 +363,12 @@ public class Session {
 		@Override
 		public void response(Message response) {
 			try {
-				byte c = response.code();
-				byte s = response.status();
+				var c = response.code();
+				var s = response.status();
 				if(((code != null && c == code) || (code == null && s == OK))) {
 					if(responseHandler != null) responseHandler.apply(response);
 				} else if(s == ERROR && errorHandler != null) {
-					String msg = response.in().readUTF();
+					var msg = response.in().readUTF();
 					errorHandler.error("Remote Exception: "+msg);
 				} else if(errorHandler != null ) {
 					errorHandler.error("Unexpected Response: "+code+" "+response.code());

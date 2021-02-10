@@ -128,7 +128,7 @@ public final class Entity implements Comparable<Entity>, Cloneable, Encodable {
 	 * @throws IOException if there was a problem reading from the input stream.
 	 */
 	public Entity(VarInput in) throws IOException {
-		int serialVersion = in.readUnsignedByte();
+		var serialVersion = in.readUnsignedByte();
 		address = in.read(Address::new);
 		name = in.readUTF();
 		pending = in.readBoolean();
@@ -353,7 +353,7 @@ public final class Entity implements Comparable<Entity>, Cloneable, Encodable {
 	public boolean equals(Object o){
 		if(this == o) return true;
 		if(o != null && o.getClass() == Entity.class) {
-			final Entity e = (Entity)o;
+			final var e = (Entity)o;
 			return address.equals(e.address)
 				&& ((imported == null && e.imported == null) || imported.equals(e.imported))
 				&& exported.equals(e.exported)

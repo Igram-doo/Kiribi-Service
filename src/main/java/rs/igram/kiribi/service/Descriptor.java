@@ -227,10 +227,10 @@ public final class Descriptor implements Encodable {
 	}
 	
 	static Set<String> parseTags(String tags){
-		Set<String> result = new HashSet<>();
+		var result = new HashSet<String>();
 		if(!tags.isEmpty()) {
-			String[] items = tags.toLowerCase().split("\\s");
-			int L = Math.min(5, items.length);
+			var items = tags.toLowerCase().split("\\s");
+			var L = Math.min(5, items.length);
 			for(int i = 0; i < L; i++) result.add(items[i]);
 		}
 		return result;
@@ -240,7 +240,7 @@ public final class Descriptor implements Encodable {
 	public boolean equals(Object o){
 		if(this == o) return true;
 		if(o != null && o.getClass() == Descriptor.class) {
-			Descriptor d = (Descriptor)o;
+			var d = (Descriptor)o;
 			return version == d.version
 			       && address.equals(d.address)
 			       && type == d.type
@@ -376,8 +376,8 @@ public final class Descriptor implements Encodable {
 		 * @return The byte array containing an image of the service.
 		 */
 		public byte[] getImage() {
-			final int L = image.length;
-			final byte[] result  = new byte[L];
+			final var L = image.length;
+			final var result  = new byte[L];
 			System.arraycopy(image, 0, result, 0, L);
 			return result;
 		}
@@ -385,7 +385,7 @@ public final class Descriptor implements Encodable {
 		@Override
 		public boolean equals(Object o){
 			if(o != null && o.getClass().equals(Description.class)) {
-				Description d = (Description)o;
+				var d = (Description)o;
 				return title.equals(d.title)
 				       && description.equals(d.description)
 				       && Arrays.equals(image, d.image);

@@ -75,9 +75,9 @@ abstract class Authenticator {
 	
 	private static boolean authenticateServer(ServiceAddress address, boolean isProxy, EncodedStream stream, EntityManager mgr) throws IOException {
 		if(isProxy) {
-			Challenge challenge = new Challenge();
+			var challenge = new Challenge();
 			stream.write(challenge);
-			SignedData data = stream.read(SignedData::new);
+			var data = stream.read(SignedData::new);
 			return challenge.verify(data, address.host());
 		} else {
 			Challenge challenge = stream.read(Challenge::new);
@@ -122,7 +122,7 @@ abstract class Authenticator {
 		
 		private boolean authenticate(Address addr) {
 			try {
-				Optional<Entity> optional = mgr.authenticate(addr, address.id());
+				var optional = mgr.authenticate(addr, address.id());
 				if(optional.isPresent()) {
 					entity = optional.get();
 					return true;
@@ -139,19 +139,19 @@ abstract class Authenticator {
 				if(!authenticateServer(address, isProxy, stream, mgr)) return false;
 				if(isProxy) {
 					// make sure the entity for the given address is in the entity manager
-					Optional<Entity> optional = mgr.entity(address.host());
+					var optional = mgr.entity(address.host());
 					if(optional.isPresent()) {
-						Challenge challenge = stream.read(Challenge::new);
+						var challenge = stream.read(Challenge::new);
 						stream.write(mgr.admin.signData(challenge.encode()));					
 						entity = optional.get();
 						return true;
 					}
 					return false;
 				} else {
-					Challenge challenge = new Challenge();
+					var challenge = new Challenge();
 					stream.write(challenge);					
-					SignedData data = stream.read(SignedData::new);
-					Address addr = new Address(data.getPublicKey());
+					var data = stream.read(SignedData::new);
+					var addr = new Address(data.getPublicKey());
 					if(!challenge.verify(data, addr)) return false;
 					return authenticate(addr);
 				}
@@ -186,7 +186,7 @@ abstract class Authenticator {
 	
 		boolean verify(SignedData data, Address address) {
 			try {
-				Address addr = new Address(data.getPublicKey());
+				var addr = new Address(data.getPublicKey());
 				return data.verify(data.getPublicKey()) && address.equals(addr) && Arrays.equals(b, data.data());
 			} catch(IOException e) {
 				return false;
@@ -199,7 +199,7 @@ abstract class Authenticator {
 	
 		@Override
 		public byte[] encode() throws IOException {
-			byte[] encoded = new byte[SIZE];
+			var encoded = new byte[SIZE];
 			System.arraycopy(b, 0, encoded, 0, SIZE);
 			return encoded;
 		}
