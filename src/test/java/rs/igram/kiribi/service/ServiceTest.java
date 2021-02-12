@@ -80,9 +80,9 @@ class ServiceTest {
 	NATTServer server;
 	
 	void setup(int offset, Peer.Type type, Scope scope) throws Exception {
-		int port = 4000;
+		var port = 4000;
 		
-		InetSocketAddress serverAddress = type == Peer.Type.LAN ?
+		var serverAddress = type == Peer.Type.LAN ?
 			EndpointProvider.defaultGroup():
 			new InetSocketAddress(NetworkMonitor.inet(), port + offset);
 			
@@ -102,15 +102,15 @@ class ServiceTest {
 	}
 	
 	void configureEntities(Scope scope) throws Exception {
-		CountDownLatch latch = new CountDownLatch(1);
+		var latch = new CountDownLatch(1);
 		bob = new Entity(true, peer2.address.toString(), BOB);
 		alice = new Entity(true, peer1.address.toString(), ALICE);
 		
-		ServiceAddress address = peer1.admin.address(ID); 
-		TestService service = new TestService(address, scope);
+		var address = peer1.admin.address(ID); 
+		var service = new TestService(address, scope);
 		peer1.admin.activate(service);
 		
-		Set<Descriptor> granted = Set.of(service.getDescriptor());
+		var granted = Set.of(service.getDescriptor());
 		bob.setGranted(granted);
 		
 		peer1.mgr.setOnExchange(e -> latch.countDown());
@@ -135,11 +135,11 @@ class ServiceTest {
 		
 		// ---- responses ----
 		Message add(Message request) throws IOException {
-			long a = request.in().readLong();
-			long b = request.in().readLong();
-			long result = a + b;
+			var a = request.in().readLong();
+			var b = request.in().readLong();
+			var result = a + b;
 			//System.out.println("PROCESSED REQUEST: " + result);
-			Message response = request.respond(CODE);
+			var response = request.respond(CODE);
 			response.out().writeLong(result);
 		
 			return response;
@@ -161,8 +161,8 @@ class ServiceTest {
 		}
 		
 		private Future<Long> add(long a, long b) throws IOException {
-			final CompletableFuture<Long> future = new CompletableFuture<Long>();
-			Message request = Message.request(CODE);
+			final var future = new CompletableFuture<Long>();
+			var request = Message.request(CODE);
 			request.out().writeLong(a);
 			request.out().writeLong(b);
 			request(
@@ -170,7 +170,7 @@ class ServiceTest {
 				new ResponseAdapter(
 					CODE, 
 					response -> {
-						long result = response.in().readLong();
+						var result = response.in().readLong();
 						future.complete(result);
 					},
 					error -> future.completeExceptionally(new IOException(error))
